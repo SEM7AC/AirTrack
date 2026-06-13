@@ -1,0 +1,51 @@
+﻿@using AirTrack.Model
+@using AirTrack.Model.Aircraft
+
+<div class="aircraft-card">
+    <div class="aircraft-type-tail">
+        @((MarkupString)$"{Aircraft.Model}&nbsp;&nbsp;•&nbsp;&nbsp;{Aircraft.TailNumber}")
+
+
+    </div>
+
+    <div class="aircraft-next">
+        Next: @(Aircraft.NextBookingStart?.ToString("HH:mm") ?? "—")
+    </div>
+
+    <div class="aircraft-status">
+        Status: @Aircraft.Status
+    </div>
+
+    <div class="aircraft-hobbs">
+        Hobbs: @Aircraft.Hobbs
+    </div>
+
+    <div class="aircraft-squawks">
+        Squawks: @Aircraft.SquawkCount
+    </div>
+</div>
+
+
+
+@code {
+    private CessnaSkyhawk Aircraft { get; set; } = new CessnaSkyhawk
+    {
+        TailNumber = "N739AB",
+        Model = "Cessna 172 Skyhawk",
+        Hobbs = 1523.4m,
+        Tach = 1488.9m,
+
+        AnnualDueDate = new DateTime(2025, 3, 12),
+        SquawkCount = 2,
+        Status = AircraftStatus.Available,
+
+        HoursSinceLastOilChange = 23.4m,
+        HoursSinceLast50Hr = 12.1m,
+        HoursSinceLast100Hr = 88.7m,
+
+        ELTInspectionDue = new DateTime(2026, 1, 5),
+        TransponderDue = new DateTime(2025, 9, 14),
+        PitotStaticDue = new DateTime(2025, 9, 14)
+    };
+
+}
