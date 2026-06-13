@@ -1,0 +1,83 @@
+﻿:root {
+    --bg-main: #0f1a2b;
+    --bg-header: #142238;
+    --bg-sidebar: #16263f;
+    --bg-content: #1c2f4a;
+    --text-primary: #e8eef5;
+    --text-secondary: #9bb0c9;
+    --accent: #3da9fc;
+    --accent-hover: #7cc8ff;
+}
+
+/* ROOT APP CONTAINER */
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: sans-serif;
+}
+
+/* HEADER */
+.app-header {
+    height: 60px;
+    background: var(--bg-header);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #1f2f4a;
+}
+
+.app-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* BODY */
+.app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* SIDEBAR */
+.app-sidebar {
+    width: 220px;
+    background: var(--bg-sidebar);
+    padding: 20px;
+    border-right: 1px solid #1f2f4a;
+    overflow-y: auto;
+}
+
+.nav-section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    margin: 20px 0 10px;
+    color: var(--text-secondary);
+}
+
+.nav-item {
+    display: block;
+    padding: 8px 0;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+    .nav-item:hover {
+        color: var(--accent-hover);
+    }
+
+    .nav-item.active {
+        color: var(--accent);
+        font-weight: bold;
+    }
+
+
+.app-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--bg-content);
+}
