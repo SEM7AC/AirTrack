@@ -1,0 +1,33 @@
+﻿@page "/aircraft"
+@rendermode InteractiveServer
+
+<h2>Aircraft</h2>
+<p>Select an action:</p>
+
+<div class="action-container">
+
+    <button class="action-card add" @onclick='() => NavigateTo("/aircraft/add")'>
+        <h3>Add Aircraft</h3>
+        <p>Create a new aircraft record.</p>
+    </button>
+
+    <button class="action-card edit" @onclick='() => NavigateTo("/aircraft/edit")'>
+        <h3>Edit Aircraft</h3>
+        <p>Modify an existing aircraft.</p>
+    </button>
+
+    <button class="action-card delete" @onclick='() => NavigateTo("/aircraft/delete")'>
+        <h3>Delete Aircraft</h3>
+        <p>Remove an aircraft from the system.</p>
+    </button>
+
+</div>
+
+@code {
+    [Inject] NavigationManager Nav { get; set; }
+
+    void NavigateTo(string url)
+    {
+        Nav.NavigateTo(url);
+    }
+}

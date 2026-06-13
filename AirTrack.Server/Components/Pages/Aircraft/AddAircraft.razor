@@ -1,0 +1,55 @@
+﻿@page "/aircraft/add"
+@rendermode InteractiveServer
+@using AirTrack.Model.Aircraft
+
+<h3>Add Aircraft</h3>
+
+<EditForm Model="@Model" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Tail Number</label>
+        <InputText @bind-Value="Model.TailNumber" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Model</label>
+        <InputText @bind-Value="Model.Model" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Hobbs</label>
+        <InputNumber @bind-Value="Model.Hobbs" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tach</label>
+        <InputNumber @bind-Value="Model.Tach" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Annual Due Date</label>
+        <InputDate @bind-Value="Model.AnnualDueDate" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <InputSelect @bind-Value="Model.Status" class="form-select">
+            @foreach (var s in Enum.GetValues<AircraftStatus>())
+            {
+                <option value="@s">@s</option>
+            }
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Aircraft</button>
+</EditForm>
+
+@code {
+    private AircraftBase Model = new CessnaSkyhawk();
+
+    private void HandleSubmit()
+    {
+        Console.WriteLine($"Added aircraft: {Model.TailNumber} ({Model.Model})");
+    }
+}
