@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+
+<div class="app-shell">
+    <header class="app-header">
+        <div class="app-title">AirTrack</div>
+    </header>
+
+    <div class="app-body">
+        <nav class="app-sidebar">
+
+            <div class="nav-section-title">Fleet</div>
+            <NavLink href="/" class="nav-item" activeClass="active">Dashboard</NavLink>
+            <NavLink href="/schedule" class="nav-item" activeClass="active">Schedule</NavLink>
+            <NavLink href="/maintenance" class="nav-item" activeClass="active">Maintenance</NavLink>
+
+            <div class="nav-section-title">Admin</div>
+            <NavLink href="/aircraft" class="nav-item" activeClass="active">Aircraft</NavLink>
+            <NavLink href="/instructors" class="nav-item" activeClass="active">Instructors</NavLink>
+            <NavLink href="/students" class="nav-item" activeClass="active">Students</NavLink>
+
+        </nav>
+
+        <main class="app-content">
+            @Body
+        </main>
+    </div>
+</div>
