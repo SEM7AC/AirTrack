@@ -2,7 +2,7 @@
     {
 
     
-    public class Cessna172 : AircraftBase
+    public class CessnaSkyhawk : AircraftBase
         {
        
 
@@ -15,6 +15,7 @@
 
         public DateTime? TransponderDue {  get; set; }
         public DateTime? PitotStaticDue {  get; set; }
-                
+
+        public List<RecurringAD> RecurringADs { get; set; } = new();
         }
     }
