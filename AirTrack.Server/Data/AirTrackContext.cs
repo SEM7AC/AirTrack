@@ -22,6 +22,10 @@ namespace AirTrack.Data
             modelBuilder.Entity<PiperSeminole>().ToTable("PiperSeminoles");
             modelBuilder.Entity<RobinsonR44>().ToTable("RobinsonR44s");
 
+            modelBuilder.Entity<AircraftBase>() // Unique Tailnumber constraint
+            .HasIndex(a => a.TailNumber)
+            .IsUnique();
+
             base.OnModelCreating(modelBuilder);
             }
 

@@ -1,41 +1,50 @@
 ﻿@page "/aircraft/add"
 @rendermode InteractiveServer
+@using AirTrack.Data
 @using AirTrack.Model.Aircraft
+@using AirTrack.Server.Models.DTO
 
 <div class="form-card">
     <h3>Add Aircraft</h3>
 
-    <EditForm Model="@Model" OnValidSubmit="@HandleSubmit">
+    <EditForm Model="@FormModel" OnValidSubmit="@HandleSubmit">
         <DataAnnotationsValidator />
 
         <div class="mb-3">
             <label class="form-label">Tail Number</label>
-            <InputText @bind-Value="Model.TailNumber" class="form-control" />
+            <InputText @bind-Value="FormModel.TailNumber" class="form-control" />
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Model</label>
-            <InputText @bind-Value="Model.Model" class="form-control" />
+            <label class="form-label">Aircraft Type</label>
+            <InputSelect @bind-Value="SelectedModel" class="form-select">
+                <option value="">-- Select Model --</option>
+                <option value="C172">Cessna 172 Skyhawk</option>
+                <option value="PA28R">Piper PA-28R Arrow</option>
+                <option value="PA44">Piper PA-44 Seminole</option>
+                <option value="R44">Robinson R44</option>
+            </InputSelect>
         </div>
+
 
         <div class="mb-3">
             <label class="form-label">Hobbs</label>
-            <InputNumber @bind-Value="Model.Hobbs" class="form-control" />
+            <InputNumber @bind-Value="FormModel.Hobbs" class="form-control" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Tach</label>
-            <InputNumber @bind-Value="Model.Tach" class="form-control" />
+            <InputNumber @bind-Value="FormModel.Tach" class="form-control" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Annual Due Date</label>
-            <InputDate @bind-Value="Model.AnnualDueDate" class="form-control" />
+            <InputDate @bind-Value="FormModel.AnnualDueDate" class="form-control" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Status</label>
-            <InputSelect @bind-Value="Model.Status" class="form-select">
+            <InputSelect @bind-Value="FormModel.Status" class="form-select">
                 @foreach (var s in Enum.GetValues<AircraftStatus>())
                 {
                     <option value="@s">@s</option>
@@ -48,10 +57,35 @@
 </div>
 
 @code {
-    private AircraftBase Model = new CessnaSkyhawk();
+    [Inject] private AirTrackContext _context { get; set; }
+
+    private AircraftFormDto FormModel = new();
+
+    private string SelectedModel { get; set; } = string.Empty;
 
     private void HandleSubmit()
-    {
-        Console.WriteLine($"Added aircraft: {Model.TailNumber} ({Model.Model})");
-    }
+{
+    AircraftBase aircraft = SelectedModel switch
+{
+    "C172" => new CessnaSkyhawk { Model = "Cessna 172 Skyhawk" }, // make the names match dashboard
+    "PA28R" => new PiperArrow { Model = "Piper PA-28R Arrow" },
+    "PA44" => new PiperSeminole { Model = "Piper PA-44 Seminole" },
+    "R44" => new RobinsonR44 { Model = "Robinson R44" },
+    _ => throw new Exception("Invalid aircraft model selected.")
+};
+
+    // Copy shared fields
+    aircraft.TailNumber = FormModel.TailNumber;
+    aircraft.Hobbs = FormModel.Hobbs;
+    aircraft.Tach = FormModel.Tach;
+    aircraft.AnnualDueDate = FormModel.AnnualDueDate;
+    aircraft.Status = FormModel.Status;
+
+    // Save to DB
+    _context.Add(aircraft);
+    _context.SaveChanges();
+
+    Console.WriteLine($"Added aircraft: {aircraft.TailNumber} ({SelectedModel})");
+}
+
 }
