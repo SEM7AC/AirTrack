@@ -1,6 +1,7 @@
 using AirTrack.Server.Components;
 using AirTrack.Data;
 using Microsoft.EntityFrameworkCore;
+using AirTrack.Server.Data;
 
 namespace AirTrack.Server
     {
@@ -13,6 +14,10 @@ namespace AirTrack.Server
             // Register AirTrackContext here
             builder.Services.AddDbContext<AirTrackContext>(options =>
             options.UseSqlite("Data Source=airtrack.db"));
+
+            //Register DbHelper
+            builder.Services.AddScoped<DbHelper>();
+
 
             // Add services to the container.
             builder.Services.AddRazorComponents()

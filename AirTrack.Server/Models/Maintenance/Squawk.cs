@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AirTrack.Model.Aircraft;
+using AirTrack.Server.Model.Aircraft;
 
-namespace AirTrack.Models.Maintenance
+namespace AirTrack.Server.Models.Maintenance
     {
     public class Squawk
         {

@@ -1,12 +1,45 @@
 ﻿.aircraft-card {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr; /* adjust ratios as needed */
     align-items: center;
-    background-color: #0A1A2F; /* dark blue */
+    background-color: #0A1A2F;
     color: white;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     border: 1px solid #1F2E45;
-    margin-bottom: 1rem;
     border-radius: 6px;
+    margin-bottom: 0.5rem;
+    height: 60px; /* consistent row height */
+    white-space: nowrap; /* prevents wrapping */
+    overflow: hidden; /* prevents overflow */
+}
+.aircraft-list {
+    max-height: calc(100vh - 180px); /* adjust depending on header size */
+    overflow-y: auto;
+    padding-right: 6px; /* prevents scrollbar overlap */
+}
+
+/* Status colors */
+.status-available {
+    color: #4CAF50; /* green */
+    font-weight: 600;
+}
+
+.status-inflight {
+    color: #40C4FF; /* sky blue */
+    font-weight: 600;
+}
+
+.status-scheduled {
+    color: #FFC107; /* amber */
+    font-weight: 600;
+}
+
+.status-mx {
+    color: #FF7043; /* aviation orange */
+    font-weight: 600;
+}
+
+.status-unknown {
+    color: #9E9E9E; /* gray */
+    font-weight: 600;
 }

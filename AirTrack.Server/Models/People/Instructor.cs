@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AirTrack.Models.People
+namespace AirTrack.Server.Models.People
     {
     public class Instructor
         {

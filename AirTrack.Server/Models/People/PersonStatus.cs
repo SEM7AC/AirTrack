@@ -1,4 +1,4 @@
-﻿namespace AirTrack.Models.People
+﻿namespace AirTrack.Server.Models.People
     {
     public enum PersonStatus
         {

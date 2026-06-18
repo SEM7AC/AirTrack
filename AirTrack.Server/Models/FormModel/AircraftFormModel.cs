@@ -1,8 +1,8 @@
 ﻿using AirTrack.Model.Aircraft;
 
-namespace AirTrack.Server.Models.DTO
+namespace AirTrack.Server.Models.FormModel
     {
-    public class AircraftFormDto
+    public class AircraftFormModel
         {
         public string TailNumber { get; set; } = string.Empty;
         public decimal Hobbs { get; set; }

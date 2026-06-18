@@ -24,7 +24,7 @@
 </div>
 
 @code {
-    [Inject] NavigationManager Nav { get; set; }
+    [Inject] NavigationManager Nav { get; set; } = null!;
 
     void NavigateTo(string url)
     {

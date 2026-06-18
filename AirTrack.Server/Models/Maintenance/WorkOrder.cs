@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AirTrack.Models.People;
+using AirTrack.Server.Models.People;
 
-namespace AirTrack.Models.Maintenance
+namespace AirTrack.Server.Models.Maintenance
     {
     public class WorkOrder
         {

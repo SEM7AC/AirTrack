@@ -1,8 +1,41 @@
 ﻿@page "/"
 
 @using AirTrack.Server.Components;
+@using AirTrack.Model.Aircraft
+@using AirTrack.Data;
+@using AirTrack.Server.Data
+@using Microsoft.EntityFrameworkCore;
+@inject DbHelper Db
+
 <PageTitle>AirTrack - Dashboard</PageTitle>
 
 
-<AircraftCard />
+@if (AircraftList is null)
+{
+    <p>Loading...</p>
+}
+else if (AircraftList.Count == 0)
+{
+    <p>No aircraft found.</p>
+}
+else
+{
+    <div class="aircraft-list">
+        <div class="aircraft-grid">
+            @foreach (var plane in AircraftList)
+            {
+                <AircraftCard Aircraft="plane" />
+            }
+        </div>
+    </div>
+}
 
+@code {
+    
+    private List<AircraftBase> AircraftList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AircraftList = await Db.GetAllAircraft();
+    }
+}

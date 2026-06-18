@@ -1,4 +1,4 @@
-﻿namespace AirTrack.Model.Aircraft
+﻿namespace AirTrack.Server.Model.Aircraft
     {
 
     

@@ -12,7 +12,7 @@
         Next: @(Aircraft.NextBookingStart?.ToString("HH:mm") ?? "—")
     </div>
 
-    <div class="aircraft-status">
+    <div class="aircraft-status @GetStatusClass(Aircraft.Status.ToString())">
         Status: @Aircraft.Status
     </div>
 
@@ -27,25 +27,21 @@
 
 
 
+
 @code {
-    private CessnaSkyhawk Aircraft { get; set; } = new CessnaSkyhawk
-    {
-        TailNumber = "N739AB",
-        Model = "Cessna 172 Skyhawk",
-        Hobbs = 1523.4m,
-        Tach = 1488.9m,
+    [Parameter]
+    public AircraftBase Aircraft { get; set; } = null!;
 
-        AnnualDueDate = new DateTime(2025, 3, 12),
-        SquawkCount = 2,
-        Status = AircraftStatus.Available,
-
-        HoursSinceLastOilChange = 23.4m,
-        HoursSinceLast50Hr = 12.1m,
-        HoursSinceLast100Hr = 88.7m,
-
-        ELTInspectionDue = new DateTime(2026, 1, 5),
-        TransponderDue = new DateTime(2025, 9, 14),
-        PitotStaticDue = new DateTime(2025, 9, 14)
-    };
-
+    private string GetStatusClass(string status) =>
+        status.ToLower() switch
+        {
+            "available"   => "status-available",
+            "inflight"    => "status-inflight",
+            "scheduled"   => "status-scheduled",
+            "maintenance" => "status-mx",
+            _             => "status-unknown"
+        };
 }
+
+
+

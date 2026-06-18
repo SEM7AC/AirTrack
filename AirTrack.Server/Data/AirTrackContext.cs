@@ -1,9 +1,9 @@
-﻿using AirTrack.Model.Aircraft;
-using AirTrack.Models.Maintenance;
-using AirTrack.Models.People;
+﻿using AirTrack.Server.Model.Aircraft;
+using AirTrack.Server.Models.Maintenance;
+using AirTrack.Server.Models.People;
 using Microsoft.EntityFrameworkCore;
 
-namespace AirTrack.Data
+namespace AirTrack.Server.Data
     {
     public class AirTrackContext : DbContext
         {
@@ -25,6 +25,13 @@ namespace AirTrack.Data
             modelBuilder.Entity<AircraftBase>() // Unique Tailnumber constraint
             .HasIndex(a => a.TailNumber)
             .IsUnique();
+
+            modelBuilder.Entity<AircraftBase>()
+                        .HasMany<RecurringAD>()
+                        .WithOne(ad => ad.Aircraft)
+                        .HasForeignKey(ad => ad.AircraftId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
 
             base.OnModelCreating(modelBuilder);
             }

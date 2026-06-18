@@ -1,8 +1,8 @@
-﻿using AirTrack.Model.Aircraft;
-using AirTrack.Models.People;
+﻿using AirTrack.Server.Model.Aircraft;
+using AirTrack.Server.Models.People;
 using System.ComponentModel.DataAnnotations;
 
-namespace AirTrack.Models.Maintenance
+namespace AirTrack.Server.Models.Maintenance
     {
     public class CorrectiveAction
         {

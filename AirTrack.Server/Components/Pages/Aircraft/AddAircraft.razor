@@ -1,8 +1,9 @@
 ﻿@page "/aircraft/add"
 @rendermode InteractiveServer
-@using AirTrack.Data
-@using AirTrack.Model.Aircraft
-@using AirTrack.Server.Models.DTO
+@using AirTrack.Server.Model.Aircraft
+@using AirTrack.Server.Data
+@using AirTrack.Server.Models.FormModel
+@inject DbHelper Db
 
 <div class="form-card">
     <h3>Add Aircraft</h3>
@@ -57,33 +58,32 @@
 </div>
 
 @code {
-    [Inject] private AirTrackContext _context { get; set; }
 
-    private AircraftFormDto FormModel = new();
+    private AircraftFormModel FormModel = new();
 
     private string SelectedModel { get; set; } = string.Empty;
 
-    private void HandleSubmit()
-{
-    AircraftBase aircraft = SelectedModel switch
-{
-    "C172" => new CessnaSkyhawk { Model = "Cessna 172 Skyhawk" }, // make the names match dashboard
-    "PA28R" => new PiperArrow { Model = "Piper PA-28R Arrow" },
-    "PA44" => new PiperSeminole { Model = "Piper PA-44 Seminole" },
-    "R44" => new RobinsonR44 { Model = "Robinson R44" },
-    _ => throw new Exception("Invalid aircraft model selected.")
-};
+    private async Task HandleSubmit()
+        {
+        AircraftBase aircraft = SelectedModel switch
+            {
+                "C172" => new CessnaSkyhawk { Model = "Cessna 172 Skyhawk" }, // make the names match dashboard
+                "PA28R" => new PiperArrow { Model = "Piper PA-28R Arrow" },
+                "PA44" => new PiperSeminole { Model = "Piper PA-44 Seminole" },
+                "R44" => new RobinsonR44 { Model = "Robinson R44" },
+                _ => throw new Exception("Invalid aircraft model selected.")
+                };
 
-    // Copy shared fields
-    aircraft.TailNumber = FormModel.TailNumber;
-    aircraft.Hobbs = FormModel.Hobbs;
-    aircraft.Tach = FormModel.Tach;
-    aircraft.AnnualDueDate = FormModel.AnnualDueDate;
-    aircraft.Status = FormModel.Status;
+        // Copy shared fields
+        aircraft.TailNumber = FormModel.TailNumber;
+        aircraft.Hobbs = FormModel.Hobbs;
+        aircraft.Tach = FormModel.Tach;
+        aircraft.AnnualDueDate = FormModel.AnnualDueDate;
+        aircraft.Status = FormModel.Status;
 
-    // Save to DB
-    _context.Add(aircraft);
-    _context.SaveChanges();
+        // Save to DB
+
+        await Db.AddAircraft(aircraft);
 
     Console.WriteLine($"Added aircraft: {aircraft.TailNumber} ({SelectedModel})");
 }
