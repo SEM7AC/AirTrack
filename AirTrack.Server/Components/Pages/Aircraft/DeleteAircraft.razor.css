@@ -1,9 +1,14 @@
-﻿.delete-layout {
+﻿/* ============================================================
+   LAYOUT
+   ============================================================ */
+.delete-layout {
     display: flex;
     height: 100%;
 }
 
-/* Sidebar */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 .sidebar {
     width: 280px;
     background-color: #0A1A2F;
@@ -11,6 +16,7 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* prevents entire sidebar from scrolling */
 }
 
 .sidebar-title {
@@ -20,6 +26,7 @@
     font-weight: 600;
 }
 
+/* Search box */
 .search-box {
     background-color: #0D2238;
     border: 1px solid #1F2E45;
@@ -27,13 +34,22 @@
     margin-bottom: 16px;
 }
 
-/* Aircraft list items */
+/* Scrollable aircraft list area */
+.aircraft-list-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px; /* avoids scrollbar overlap */
+}
+
+/* ============================================================
+   AIRCRAFT LIST ITEMS
+   ============================================================ */
 .aircraft-item {
     padding: 12px 14px;
-    border-radius: 6px;
+    margin-bottom: 10px;
     background-color: #0D2238;
     border: 1px solid #1F2E45;
-    margin-bottom: 10px;
+    border-radius: 6px;
     cursor: pointer;
     transition: 0.15s ease;
 }
@@ -60,7 +76,9 @@
         font-size: 0.85rem;
     }
 
-/* Main content */
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
 .content {
     flex: 1;
     padding: 30px;
@@ -72,7 +90,9 @@
     font-size: 1.1rem;
 }
 
-/* Delete card */
+/* ============================================================
+   DELETE CARD
+   ============================================================ */
 .delete-card {
     background-color: #0D2238;
     border: 1px solid #1F2E45;
@@ -86,7 +106,9 @@
         color: #E8F1FF;
     }
 
-/* Delete button */
+/* ============================================================
+   DELETE BUTTON
+   ============================================================ */
 .delete-btn {
     margin-top: 20px;
     padding: 12px 18px;
@@ -103,20 +125,3 @@
         background-color: #E53935;
         box-shadow: 0 0 8px #E5393555;
     }
-/* Make the sidebar scrollable only in the list area */
-.sidebar {
-    width: 280px;
-    background-color: #0A1A2F;
-    border-right: 1px solid #1F2E45;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* prevents whole sidebar from scrolling */
-}
-
-/* The list itself becomes scrollable */
-.aircraft-list-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 6px; /* avoids scrollbar overlap */
-}

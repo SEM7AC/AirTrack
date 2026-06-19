@@ -9,9 +9,18 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <h3 class="sidebar-title">Add Aircraft</h3>
-        <p class="sidebar-info">Enter the details below to add a new aircraft.</p>
+    <h3 class="sidebar-title">Added This Session</h3>
+
+    <div class="session-list-scroll">
+        @foreach (var ac in SessionAircraft)
+        {
+            <div class="session-item">
+                <div class="tail">@ac.TailNumber</div>
+                <div class="model">@ac.Model</div>
+            </div>
+        }
     </div>
+</div>
 
     <!-- Main content -->
     <div class="content">
@@ -78,17 +87,18 @@
 @code {
     private AircraftFormModel FormModel = new();
     private string SelectedModel { get; set; } = string.Empty;
+    private List<AircraftBase> SessionAircraft = new(); // Session list
 
     private async Task HandleSubmit()
-    {
-        AircraftBase aircraft = SelectedModel switch
         {
-            "C172" => new CessnaSkyhawk { Model = "Cessna 172 Skyhawk" },
-            "PA28R" => new PiperArrow { Model = "Piper PA-28R Arrow" },
-            "PA44" => new PiperSeminole { Model = "Piper PA-44 Seminole" },
-            "R44" => new RobinsonR44 { Model = "Robinson R44" },
-            _ => throw new Exception("Invalid aircraft model selected.")
-        };
+        AircraftBase aircraft = SelectedModel switch
+            {
+                "C172" => new CessnaSkyhawk { Model = "Cessna 172 Skyhawk" },
+                "PA28R" => new PiperArrow { Model = "Piper PA-28R Arrow" },
+                "PA44" => new PiperSeminole { Model = "Piper PA-44 Seminole" },
+                "R44" => new RobinsonR44 { Model = "Robinson R44" },
+                _ => throw new Exception("Invalid aircraft model selected.")
+                };
 
         aircraft.TailNumber = FormModel.TailNumber;
         aircraft.Hobbs = FormModel.Hobbs;
@@ -99,6 +109,9 @@
         await Db.AddAircraft(aircraft);
 
         Console.WriteLine($"Added aircraft: {aircraft.TailNumber} ({SelectedModel})");
+
+        // Add to session list
+        SessionAircraft.Add(aircraft);
 
         // Reset form
         FormModel = new AircraftFormModel();

@@ -1,9 +1,14 @@
-﻿.add-layout {
+﻿/* ============================================================
+   LAYOUT
+   ============================================================ */
+.add-layout {
     display: flex;
     height: 100%;
 }
 
-/* Sidebar */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 .sidebar {
     width: 280px;
     background-color: #0A1A2F;
@@ -24,14 +29,47 @@
     font-size: 0.9rem;
 }
 
-/* Main content */
+/* Scrollable session list */
+.session-list-scroll {
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Dashboard-style session cards */
+.session-item {
+    background-color: #0D2238;
+    border: 1px solid #1F2E45;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 10px #000;
+}
+
+    .session-item .tail {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #E8F1FF;
+    }
+
+    .session-item .model {
+        font-size: 0.9rem;
+        color: #C9D6E8;
+        margin-top: 4px;
+    }
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
 .content {
     flex: 1;
     padding: 30px;
     color: #E8F1FF;
 }
 
-/* Card */
+/* ============================================================
+   ADD CARD
+   ============================================================ */
 .add-card {
     background-color: #0D2238;
     border: 1px solid #1F2E45;
@@ -45,7 +83,9 @@
         color: #E8F1FF;
     }
 
-/* Form layout */
+/* ============================================================
+   FORM LAYOUT
+   ============================================================ */
 .form-row {
     display: flex;
     gap: 20px;
@@ -67,6 +107,7 @@ label {
     color: #E8F1FF;
 }
 
+/* Inputs */
 .form-control,
 .form-select {
     background-color: #0A1A2F;
@@ -80,7 +121,9 @@ label {
         box-shadow: 0 0 6px #4CC2FF55;
     }
 
-/* Save button */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 .save-btn {
     margin-top: 10px;
     padding: 12px 18px;
