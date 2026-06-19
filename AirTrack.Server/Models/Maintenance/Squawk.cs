@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AirTrack.Server.Model.Aircraft;
+using AirTrack.Server.Models.Aircraft;
 
 namespace AirTrack.Server.Models.Maintenance
     {

@@ -1,5 +1,5 @@
 ﻿using AirTrack.Server.Data;
-using AirTrack.Server.Model.Aircraft;
+using AirTrack.Server.Models.Aircraft;
 using Microsoft.EntityFrameworkCore;
 
 namespace AirTrack.Server.Data

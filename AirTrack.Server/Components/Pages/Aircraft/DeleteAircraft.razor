@@ -1,0 +1,117 @@
+﻿@page "/aircraft/delete"
+@rendermode InteractiveServer
+@using AirTrack.Server.Models.Aircraft
+@using AirTrack.Server.Data
+@inject DbHelper Db
+@inject NavigationManager Nav
+
+<div class="delete-layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h3 class="sidebar-title">Aircraft</h3>
+
+        <input class="form-control mb-3 search-box"
+               placeholder="Search by tail number or model..."
+               @bind="SearchTermInternal" />
+
+        @if (FilteredAircraft is null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="aircraft-list-scroll">
+                @foreach (var ac in FilteredAircraft)
+                {
+                    <div class="aircraft-item @(SelectedAircraftId == ac.Id ? "selected" : "")"
+                    @onclick="() => SelectedAircraftId = ac.Id">
+
+                    <div class="tail">@ac.TailNumber</div>
+                    <div class="model">@ac.Model</div>
+                    </div>
+                }
+            </div>
+
+        }
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+        @if (SelectedAircraftId is null)
+        {
+            <div class="placeholder">
+                <p>Select an aircraft to delete</p>
+            </div>
+        }
+        else
+        {
+            var selected = AircraftList?.FirstOrDefault(a => a.Id == SelectedAircraftId);
+
+            <div class="delete-card">
+                <h2>Delete Aircraft</h2>
+
+                <p><strong>Tail:</strong> @selected?.TailNumber</p>
+                <p><strong>Model:</strong> @selected?.Model</p>
+
+                <button class="delete-btn" @onclick="ConfirmDelete">
+                    Delete Aircraft
+                </button>
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+    private List<AircraftBase>? AircraftList;
+    private IEnumerable<AircraftBase>? FilteredAircraft;
+    private int? SelectedAircraftId;
+    private string SearchTerm = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+        {
+        AircraftList = await Db.GetAllAircraft();
+        FilteredAircraft = AircraftList;
+        }
+
+    private void ApplyFilter()
+        {
+        if (string.IsNullOrWhiteSpace(SearchTerm))
+            {
+            FilteredAircraft = AircraftList;
+            return;
+            }
+
+        var term = SearchTerm.ToLower();
+        FilteredAircraft = (AircraftList ?? Enumerable.Empty<AircraftBase>())
+            .Where(ac =>
+                ac.TailNumber.ToLower().Contains(term) ||
+                ac.Model.ToLower().Contains(term));
+        }
+
+    private string SearchTermInternal
+        {
+        get => SearchTerm;
+        set
+            {
+            SearchTerm = value;
+            ApplyFilter();
+            }
+        }
+
+    private async Task ConfirmDelete()
+        {
+        if (SelectedAircraftId is null)
+            return;
+
+
+        await Db.DeleteAircraft(SelectedAircraftId.Value);
+
+        AircraftList = await Db.GetAllAircraft();
+        FilteredAircraft = AircraftList;
+        SelectedAircraftId = null;
+        
+        
+    }
+}

@@ -1,0 +1,22 @@
+﻿@inherits ComponentBase
+
+@if (IsVisible)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-message">@Message</div>
+
+            <div class="modal-buttons">
+                <button class="confirm-btn" @onclick="OnConfirm">Confirm</button>
+                <button class="cancel-btn" @onclick="OnCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+}

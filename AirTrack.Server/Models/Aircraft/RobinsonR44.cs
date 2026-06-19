@@ -1,4 +1,4 @@
-﻿using AirTrack.Server.Model.Aircraft;
+﻿using AirTrack.Server.Models.Aircraft;
 
 public class RobinsonR44 : AircraftBase
     {

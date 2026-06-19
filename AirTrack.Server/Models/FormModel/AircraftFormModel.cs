@@ -1,4 +1,4 @@
-﻿using AirTrack.Model.Aircraft;
+﻿using AirTrack.Server.Models.Aircraft;
 
 namespace AirTrack.Server.Models.FormModel
     {

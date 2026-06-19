@@ -1,7 +1,6 @@
 using AirTrack.Server.Components;
-using AirTrack.Data;
-using Microsoft.EntityFrameworkCore;
 using AirTrack.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace AirTrack.Server
     {

@@ -1,4 +1,4 @@
-﻿namespace AirTrack.Server.Model.Aircraft
+﻿namespace AirTrack.Server.Models.Aircraft
     {
     public class PiperSeminole : AircraftBase
         {

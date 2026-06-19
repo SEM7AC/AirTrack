@@ -1,4 +1,4 @@
-﻿using AirTrack.Server.Model.Aircraft;
+﻿using AirTrack.Server.Models.Aircraft;
 using AirTrack.Server.Models.Maintenance;
 using AirTrack.Server.Models.People;
 using Microsoft.EntityFrameworkCore;
