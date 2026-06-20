@@ -1,5 +1,6 @@
 ﻿using AirTrack.Server.Data;
 using AirTrack.Server.Models.Aircraft;
+using AirTrack.Server.Models.People;
 using Microsoft.EntityFrameworkCore;
 
 namespace AirTrack.Server.Data
@@ -49,5 +50,122 @@ namespace AirTrack.Server.Data
             {
             return await _context.AircraftBases.FindAsync(id);
             }
+
+        // ADD STUDENT
+        public async Task AddStudent(Student student)
+            {
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
+            }
+
+        // UPDATE STUDENT
+        public async Task UpdateStudent(Student student)
+            {
+            _context.Students.Update(student);
+            await _context.SaveChangesAsync();
+            }
+
+        // DELETE STUDENT
+        public async Task DeleteStudent(int id)
+            {
+            var student = await _context.Students.FindAsync(id);
+            if (student is null)
+                return;
+
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+            }
+
+        // GET ALL STUDENTS
+        public async Task<List<Student>> GetAllStudents()
+            {
+            return await _context.Students
+                .Include(s => s.AssignedInstructor)
+                .ToListAsync();
+            }
+
+        // GET ONE STUDENT
+        public async Task<Student?> GetStudent(int id)
+            {
+            return await _context.Students
+                .Include(s => s.AssignedInstructor)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            }
+                
+        // ADD INSTRUCTOR
+        public async Task AddInstructor(Instructor instructor)
+            {
+            _context.Instructors.Add(instructor);
+            await _context.SaveChangesAsync();
+            }
+
+        // UPDATE INSTRUCTOR
+        public async Task UpdateInstructor(Instructor instructor)
+            {
+            _context.Instructors.Update(instructor);
+            await _context.SaveChangesAsync();
+            }
+
+        // DELETE INSTRUCTOR
+        public async Task DeleteInstructor(int id)
+            {
+            var instructor = await _context.Instructors.FindAsync(id);
+            if (instructor is null)
+                return;
+
+            _context.Instructors.Remove(instructor);
+            await _context.SaveChangesAsync();
+            }
+
+        // GET ALL INSTRUCTORS
+        public async Task<List<Instructor>> GetAllInstructors()
+            {
+            return await _context.Instructors.ToListAsync();
+            }
+
+        // GET ONE INSTRUCTOR
+        public async Task<Instructor?> GetInstructor(int id)
+            {
+            return await _context.Instructors.FindAsync(id);
+            }
+       
+        // ADD MECHANIC
+        public async Task AddMechanic(Mechanic mechanic)
+            {
+            _context.Mechanics.Add(mechanic);
+            await _context.SaveChangesAsync();
+            }
+
+        // UPDATE MECHANIC
+        public async Task UpdateMechanic(Mechanic mechanic)
+            {
+            _context.Mechanics.Update(mechanic);
+            await _context.SaveChangesAsync();
+            }
+
+        // DELETE MECHANIC
+        public async Task DeleteMechanic(int id)
+            {
+            var mechanic = await _context.Mechanics.FindAsync(id);
+            if (mechanic is null)
+                return;
+
+            _context.Mechanics.Remove(mechanic);
+            await _context.SaveChangesAsync();
+            }
+
+        // GET ALL MECHANICS
+        public async Task<List<Mechanic>> GetAllMechanics()
+            {
+            return await _context.Mechanics.ToListAsync();
+            }
+
+        // GET ONE MECHANIC
+        public async Task<Mechanic?> GetMechanic(int id)
+            {
+            return await _context.Mechanics.FindAsync(id);
+            }
+
+
         }
     }
