@@ -1,0 +1,246 @@
+﻿/* MAIN LAYOUT */
+.aircraft-container {
+    display: flex;
+    height: 100vh;
+    background-color: #0A1929;
+    overflow: hidden;
+}
+
+/* LEFT PANEL */
+.list-panel {
+    width: 350px;
+    background-color: #0D2238;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 2px solid #112B45;
+    /* THE REAL FIX */
+    flex: 0 0 auto;
+    min-height: 0;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .header h2 {
+        color: #A8C7E6;
+        margin: 0;
+    }
+
+.actions button {
+    padding: 10px 14px;
+    background-color: #1E4973;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+
+    .actions button:hover {
+        background-color: #2A5E94;
+    }
+
+/* SEARCH BOX */
+.search-box {
+    margin-bottom: 16px;
+    background-color: #0D2238;
+    border: 1px solid #1F2E45;
+    border-radius: 6px;
+    padding: 0;
+}
+
+.list-panel .search-box {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.search-box input {
+    width: calc(100% - 12px);
+    margin-left: 6px;
+    margin-right: 6px;
+    padding: 10px;
+    background-color: #0A1A2F;
+    border: 1px solid #1F2E45;
+    border-radius: 6px;
+    color: #E8F1FF;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+    .search-box input::placeholder {
+        color: #7A8BA3;
+    }
+
+    .search-box input:focus {
+        border-color: #4CC2FF;
+        box-shadow: 0 0 6px #4CC2FF55;
+        outline: none;
+    }
+
+/* AIRCRAFT LIST */
+.aircraft-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+    .aircraft-list li {
+        padding: 12px;
+        margin-bottom: 8px;
+        background-color: #112B45;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+        .aircraft-list li:hover {
+            background-color: #16375A;
+        }
+
+        .aircraft-list li.selected {
+            background-color: #1E4973;
+        }
+
+    .aircraft-list .name {
+        font-weight: bold;
+        color: white;
+    }
+
+    .aircraft-list .sub {
+        font-size: 0.9rem;
+        color: #A8C7E6;
+    }
+
+/* RIGHT PANEL */
+.detail-panel {
+    flex: 1 1 auto;
+    padding: 20px;
+    background-color: #0D2238;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
+    min-height: 0;
+}
+
+    .detail-panel h3 {
+        color: #A8C7E6;
+        margin-bottom: 12px;
+    }
+
+    /* FORM LAYOUT */
+    .detail-panel form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-width: 900px;
+        height: 100%;
+        justify-content: space-between;
+    }
+
+/* Group sections */
+.form-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+/* Two-column field layout */
+.form-row {
+    flex: 1 1 calc(50% - 12px);
+    display: flex;
+    flex-direction: column;
+    min-width: 220px;
+}
+
+    .form-row label {
+        color: #A8C7E6;
+        margin-bottom: 3px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+        padding: 6px 8px;
+        border-radius: 5px;
+        border: none;
+        background-color: #112B45;
+        color: white;
+        font-size: 0.85rem;
+        height: 28px;
+    }
+
+/* Section titles */
+.form-section h4 {
+    width: 100%;
+    color: #A8C7E6;
+    border-bottom: 1px solid #1E4973;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+/* Equipment checkbox layout */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #112B45;
+    border: 1px solid #1F2E45;
+    border-radius: 5px;
+    padding: 4px 8px;
+    color: #A8C7E6;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s ease;
+    font-size: 0.8rem;
+}
+
+    .checkbox-item:hover {
+        background-color: #16375A;
+        border-color: #4CC2FF55;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+        accent-color: #1E4973;
+        cursor: pointer;
+    }
+
+/* BUTTONS */
+button[type="submit"],
+button[type="button"] {
+    padding: 6px 12px;
+    background-color: #1E4973;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    margin-right: 6px;
+    font-size: 0.85rem;
+}
+
+    button[type="submit"]:hover,
+    button[type="button"]:hover {
+        background-color: #2A5E94;
+    }

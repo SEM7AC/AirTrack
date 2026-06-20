@@ -1,0 +1,429 @@
+﻿@page "/aircraft"
+@rendermode InteractiveServer
+
+@using AirTrack.Server.Data
+@using AirTrack.Server.Models.Aircraft
+@using AirTrack.Server.Models.FormModel
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject DbHelper Db
+
+<div class="aircraft-container">
+
+    <!-- LEFT LIST PANEL -->
+    <div class="list-panel">
+        <div class="header">
+            <h2>Aircraft</h2>
+
+            <div class="actions">
+                <button type="button" @onclick="ShowAddPanel">Add Aircraft</button>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="search-box">
+            <input type="text"
+                   placeholder="Search by tail number or model..."
+                   @bind="SearchText"
+                   @bind:event="oninput" />
+        </div>
+
+        <ul class="aircraft-list">
+            @foreach (var a in FilteredAircraft)
+            {
+                <li class="@(SelectedAircraft?.Id == a.Id ? "selected" : "")"
+                    @onclick="() => SelectAircraft(a)"
+                    @onclick:stopPropagation="true">
+
+                    <div class="name">@a.TailNumber</div>
+                    <div class="sub">@a.Model (@a.Status)</div>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="detail-panel">
+
+        @if (ActivePanel == "add")
+        {
+            <h3>Add Aircraft</h3>
+
+            <EditForm Model="AddModel" OnValidSubmit="AddAircraft">
+                <DataAnnotationsValidator />
+
+                <!-- SECTION: Identity -->
+                <div class="form-section">
+                    <h4>Identity</h4>
+
+                    <div class="form-row">
+                        <label>Tail Number</label>
+                        <InputText @bind-Value="AddModel.TailNumber" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Model</label>
+                        <InputText @bind-Value="AddModel.Model" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Year</label>
+                        <InputNumber @bind-Value="AddModel.Year" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Seats</label>
+                        <InputNumber @bind-Value="AddModel.Seats" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Specs -->
+                <div class="form-section">
+                    <h4>Specifications</h4>
+
+                    <div class="form-row">
+                        <label>Engine Type</label>
+                        <InputText @bind-Value="AddModel.EngineType" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Fuel Type</label>
+                        <InputText @bind-Value="AddModel.FuelType" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Notes</label>
+                        <InputText @bind-Value="AddModel.Notes" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Operational -->
+                <div class="form-section">
+                    <h4>Operational Time</h4>
+
+                    <div class="form-row">
+                        <label>Hobbs</label>
+                        <InputNumber @bind-Value="AddModel.Hobbs" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Tach</label>
+                        <InputNumber @bind-Value="AddModel.Tach" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Maintenance -->
+                <div class="form-section">
+                    <h4>Maintenance</h4>
+
+                    <div class="form-row">
+                        <label>Annual Due Date</label>
+                        <InputDate @bind-Value="AddModel.AnnualDueDate" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Status -->
+                <div class="form-section">
+                    <h4>Status</h4>
+
+                    <div class="form-row">
+                        <label>Status</label>
+                        <InputSelect @bind-Value="AddModel.Status">
+                            @foreach (var value in Enum.GetValues<AircraftStatus>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Equipment</label>
+                        <div class="checkbox-group">
+                            @foreach (var value in Enum.GetValues<OptionalEquipment>())
+                            {
+                                <label class="checkbox-item">
+                                    <input type="checkbox"
+                                           checked="@AddModel.Equipment.HasFlag(value)"
+                                           @onchange="e => ToggleEquipment(AddModel, value, e.Value)" />
+                                    @value
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit">Save</button>
+                    <button type="button" @onclick="ClearPanel">Cancel</button>
+                </div>
+            </EditForm>
+        }
+
+        @if (ActivePanel == "edit" && SelectedAircraft is not null)
+        {
+            <h3>Edit Aircraft</h3>
+
+            <EditForm Model="EditModel" OnValidSubmit="UpdateAircraft">
+                <DataAnnotationsValidator />
+
+                <!-- SECTION: Identity -->
+                <div class="form-section">
+                    <h4>Identity</h4>
+
+                    <div class="form-row">
+                        <label>Tail Number</label>
+                        <InputText @bind-Value="EditModel.TailNumber" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Model</label>
+                        <InputText @bind-Value="EditModel.Model" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Year</label>
+                        <InputNumber @bind-Value="EditModel.Year" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Seats</label>
+                        <InputNumber @bind-Value="EditModel.Seats" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Specs -->
+                <div class="form-section">
+                    <h4>Specifications</h4>
+
+                    <div class="form-row">
+                        <label>Engine Type</label>
+                        <InputText @bind-Value="EditModel.EngineType" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Fuel Type</label>
+                        <InputText @bind-Value="EditModel.FuelType" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Notes</label>
+                        <InputText @bind-Value="EditModel.Notes" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Operational -->
+                <div class="form-section">
+                    <h4>Operational Time</h4>
+
+                    <div class="form-row">
+                        <label>Hobbs</label>
+                        <InputNumber @bind-Value="EditModel.Hobbs" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Tach</label>
+                        <InputNumber @bind-Value="EditModel.Tach" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Maintenance -->
+                <div class="form-section">
+                    <h4>Maintenance</h4>
+
+                    <div class="form-row">
+                        <label>Annual Due Date</label>
+                        <InputDate @bind-Value="EditModel.AnnualDueDate" Disabled="true" />
+                    </div>
+                </div>
+
+                <!-- SECTION: Status -->
+                <div class="form-section">
+                    <h4>Status</h4>
+
+                    <div class="form-row">
+                        <label>Status</label>
+                        <InputSelect @bind-Value="EditModel.Status">
+                            @foreach (var value in Enum.GetValues<AircraftStatus>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Equipment</label>
+                        <div class="checkbox-group">
+                            @foreach (var value in Enum.GetValues<OptionalEquipment>())
+                            {
+                                <label class="checkbox-item">
+                                    <input type="checkbox"
+                                           checked="@EditModel.Equipment.HasFlag(value)"
+                                           @onchange="e => ToggleEquipment(EditModel, value, e.Value)" />
+                                    @value
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit">Save</button>
+                    <button type="button" @onclick="DeleteAircraft">Delete</button>
+                    <button type="button" @onclick="ClearPanel">Cancel</button>
+                </div>
+            </EditForm>
+        }
+
+    </div>
+
+</div>
+
+@code {
+
+    private List<AircraftBase> AircraftData = new();
+    private AircraftBase? SelectedAircraft;
+
+    private AircraftFormModel AddModel = new();
+    private AircraftFormModel EditModel = new();
+
+    private string ActivePanel = "";
+    private string SearchText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAircraft();
+    }
+
+    private async Task LoadAircraft()
+    {
+        AircraftData = await Db.GetAllAircraft();
+    }
+
+    private IEnumerable<AircraftBase> FilteredAircraft =>
+        AircraftData.Where(a =>
+            string.IsNullOrWhiteSpace(SearchText) ||
+            a.TailNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+            a.Model.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+        );
+
+    private void SelectAircraft(AircraftBase a)
+    {
+        SelectedAircraft = a;
+
+        EditModel = new AircraftFormModel
+        {
+            TailNumber = a.TailNumber,
+            Model = a.Model,
+            Year = a.Year,
+            EngineType = a.EngineType,
+            FuelType = a.FuelType,
+            Seats = a.Seats,
+            Notes = a.Notes,
+            Hobbs = a.Hobbs,
+            Tach = a.Tach,
+            AnnualDueDate = a.AnnualDueDate,
+            Status = a.Status,
+            Equipment = a.Equipment
+        };
+
+        ActivePanel = "edit";
+    }
+
+    private void ShowAddPanel()
+    {
+        Console.WriteLine("ADD BUTTON FIRED");
+
+        SelectedAircraft = null;
+        AddModel = new AircraftFormModel
+        {
+            
+            AnnualDueDate = DateTime.Now,
+            Status = AircraftStatus.Available,
+            Equipment = OptionalEquipment.None
+        };
+
+        ActivePanel = "add";
+    }
+
+    private async Task AddAircraft()
+    {
+        var aircraft = new GenericAircraft
+        {
+            TailNumber = AddModel.TailNumber,
+            Model = AddModel.Model,
+            Year = AddModel.Year,
+            EngineType = AddModel.EngineType,
+            FuelType = AddModel.FuelType,
+            Seats = AddModel.Seats,
+            Notes = AddModel.Notes,
+            Hobbs = AddModel.Hobbs,
+            Tach = AddModel.Tach,
+            AnnualDueDate = AddModel.AnnualDueDate,
+            Status = AddModel.Status,
+            Equipment = AddModel.Equipment
+        };
+
+        await Db.AddAircraft(aircraft);
+        await LoadAircraft();
+        await InvokeAsync(StateHasChanged);
+        ClearPanel();
+
+    }
+
+    private async Task UpdateAircraft()
+    {
+        if (SelectedAircraft is null)
+            return;
+
+        SelectedAircraft.TailNumber = EditModel.TailNumber;
+        SelectedAircraft.Model = EditModel.Model;
+        SelectedAircraft.Year = EditModel.Year;
+        SelectedAircraft.EngineType = EditModel.EngineType;
+        SelectedAircraft.FuelType = EditModel.FuelType;
+        SelectedAircraft.Seats = EditModel.Seats;
+        SelectedAircraft.Notes = EditModel.Notes;
+        SelectedAircraft.Hobbs = EditModel.Hobbs;
+        SelectedAircraft.Tach = EditModel.Tach;
+        SelectedAircraft.Status = EditModel.Status;
+        SelectedAircraft.Equipment = EditModel.Equipment;
+
+        await Db.UpdateAircraft(SelectedAircraft);
+        await LoadAircraft();
+        await InvokeAsync(StateHasChanged);
+        ClearPanel();
+
+    }
+
+    private async Task DeleteAircraft()
+    {
+        if (SelectedAircraft is null)
+            return;
+
+        await Db.DeleteAircraft(SelectedAircraft.Id);
+        await LoadAircraft();
+        await InvokeAsync(StateHasChanged);
+        ClearPanel();
+
+    }
+
+    private void ClearPanel()
+    {
+        SelectedAircraft = null;
+        AddModel = new();
+        EditModel = new();
+        ActivePanel = "";
+    }
+
+    private void ToggleEquipment(AircraftFormModel model, OptionalEquipment value, object? isChecked)
+    {
+        bool checkedState = (bool)isChecked!;
+
+        if (checkedState)
+            model.Equipment |= value;
+        else
+            model.Equipment &= ~value;
+    }
+
+    public class GenericAircraft : AircraftBase { }
+}

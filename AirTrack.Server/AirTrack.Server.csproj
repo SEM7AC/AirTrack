@@ -10,10 +10,6 @@
     <None Remove="Components\Pages\Aircraft\AircraftMain.razor.css" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Components\Pages\Aircraft\AircraftMain.razor.css" />
-  </ItemGroup>
-
   
   <ItemGroup>
     <Folder Include="Services\" />
