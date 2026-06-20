@@ -1,5 +1,5 @@
 ﻿/* layout */
-.students-container {
+.mechanics-container {
     display: grid;
     grid-template-columns: 280px 1fr;
     height: 100vh;
@@ -59,7 +59,7 @@
         }
 
 /* sidebar list */
-.student-list {
+.mechanic-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -68,8 +68,8 @@
     padding-right: 6px;
 }
 
-    /* student cards */
-    .student-list li {
+    /* mechanic cards */
+    .mechanic-list li {
         background-color: #0D2238;
         border: 1px solid #1F2E45;
         border-radius: 8px;
@@ -80,12 +80,12 @@
         transition: 0.15s ease;
     }
 
-        .student-list li:hover {
+        .mechanic-list li:hover {
             background-color: #103054;
             border-color: #4CC2FF55;
         }
 
-        .student-list li.selected {
+        .mechanic-list li.selected {
             background-color: #103054;
             border-left: 4px solid #4CC2FF;
         }

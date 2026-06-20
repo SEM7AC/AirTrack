@@ -59,11 +59,18 @@ namespace AirTrack.Server.Data
             }
 
         // UPDATE STUDENT
-        public async Task UpdateStudent(Student student)
+        public async Task UpdateStudent(Student updated)
             {
-            _context.Students.Update(student);
+            var existing = await _context.Students.FindAsync(updated.Id);
+
+            if (existing == null)
+                return;
+
+            _context.Entry(existing).CurrentValues.SetValues(updated);
+
             await _context.SaveChangesAsync();
             }
+
 
         // DELETE STUDENT
         public async Task DeleteStudent(int id)
@@ -100,9 +107,13 @@ namespace AirTrack.Server.Data
             }
 
         // UPDATE INSTRUCTOR
-        public async Task UpdateInstructor(Instructor instructor)
+        public async Task UpdateInstructor(Instructor updated)
             {
-            _context.Instructors.Update(instructor);
+            var existing = await _context.Instructors.FindAsync(updated.Id);
+            if (existing == null)
+                return;
+
+            _context.Entry(existing).CurrentValues.SetValues(updated);
             await _context.SaveChangesAsync();
             }
 
@@ -137,9 +148,13 @@ namespace AirTrack.Server.Data
             }
 
         // UPDATE MECHANIC
-        public async Task UpdateMechanic(Mechanic mechanic)
+        public async Task UpdateMechanic(Mechanic updated)
             {
-            _context.Mechanics.Update(mechanic);
+            var existing = await _context.Mechanics.FindAsync(updated.Id);
+            if (existing == null)
+                return;
+
+            _context.Entry(existing).CurrentValues.SetValues(updated);
             await _context.SaveChangesAsync();
             }
 

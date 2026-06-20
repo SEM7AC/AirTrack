@@ -1,79 +1,150 @@
 ﻿@page "/students"
 @rendermode InteractiveServer
-@using AirTrack.Server.Models.FormModel
+@using AirTrack.Server.Data
 @using AirTrack.Server.Models.People
-@using AirTrack.Server.Components.UI
+
+@inject DbHelper Db
 
 <div class="students-container">
 
-    <!-- LEFT SIDE LIST -->
+    <!-- LEFT LIST PANEL -->
     <div class="list-panel">
-        <h2>Students</h2>
+        <div class="header">
+            <h2>Students</h2>
 
-        <div class="actions">
-            <button @onclick="ShowAddForm">Add</button>
-            <button @onclick="ShowEditForm" disabled="@(!HasSelection)">Edit</button>
-            <button @onclick="ShowDeleteConfirm" disabled="@(!HasSelection)">Delete</button>
+            <div class="actions">
+                <button type="button" @onclick="ShowAddPanel">Add Student</button>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR (Aircraft-style) -->
+        <div class="search-box">
+            <input type="text"
+                   placeholder="Search by name or email..."
+                   @bind="SearchText"
+                   @bind:event="oninput" />
         </div>
 
         <ul class="student-list">
-            @foreach (var s in StudentList)
+            @foreach (var s in FilteredStudents)
             {
-                <li class="@GetRowClass(s)" @onclick="() => SelectStudent(s)">
+                <li class="@(SelectedStudent?.Id == s.Id ? "selected" : "")"
+                    @onclick="() => SelectStudent(s)">
                     <div class="name">@s.FirstName @s.LastName</div>
-                    <div class="email">@s.Email</div>
+                    <div class="sub">@s.Email</div>
                 </li>
             }
         </ul>
     </div>
 
-    <!-- RIGHT SIDE DYNAMIC PANEL -->
+    <!-- RIGHT PANEL -->
     <div class="detail-panel">
 
-        @if (ActivePanel == PanelType.Add)
+        @if (ActivePanel == "add")
         {
             <h3>Add Student</h3>
 
             <EditForm Model="AddModel" OnValidSubmit="AddStudent">
-                <InputText @bind-Value="AddModel.FirstName" placeholder="First Name" />
-                <InputText @bind-Value="AddModel.LastName" placeholder="Last Name" />
-                <InputText @bind-Value="AddModel.Email" placeholder="Email" />
-                <InputText @bind-Value="AddModel.Phone" placeholder="Phone" />
-                <InputSelect @bind-Value="AddModel.Status">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </InputSelect>
+                <DataAnnotationsValidator />
+
+                <div class="form-row">
+                    <label for="fn">First Name</label>
+                    <InputText id="fn" @bind-Value="AddModel.FirstName" />
+                    <ValidationMessage For="@(() => AddModel.FirstName)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="ln">Last Name</label>
+                    <InputText id="ln" @bind-Value="AddModel.LastName" />
+                    <ValidationMessage For="@(() => AddModel.LastName)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="em">Email</label>
+                    <InputText id="em" @bind-Value="AddModel.Email" />
+                    <ValidationMessage For="@(() => AddModel.Email)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="ph">Phone</label>
+                    <InputText id="ph" @bind-Value="AddModel.Phone" />
+                    <ValidationMessage For="@(() => AddModel.Phone)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="ed">Enrollment Date</label>
+                    <InputDate id="ed" @bind-Value="AddModel.EnrollmentDate" />
+                    <ValidationMessage For="@(() => AddModel.EnrollmentDate)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="st">Status</label>
+                    <InputSelect id="st" @bind-Value="AddModel.Status">
+                        @foreach (var value in Enum.GetValues<PersonStatus>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => AddModel.Status)" />
+                </div>
 
                 <button type="submit">Save</button>
                 <button type="button" @onclick="ClearPanel">Cancel</button>
             </EditForm>
         }
 
-        @if (ActivePanel == PanelType.Edit && SelectedStudent is not null)
+        @if (ActivePanel == "edit" && SelectedStudent is not null)
         {
             <h3>Edit Student</h3>
 
             <EditForm Model="EditModel" OnValidSubmit="UpdateStudent">
-                <InputText @bind-Value="EditModel.FirstName" />
-                <InputText @bind-Value="EditModel.LastName" />
-                <InputText @bind-Value="EditModel.Email" />
-                <InputText @bind-Value="EditModel.Phone" />
-                <InputSelect @bind-Value="EditModel.Status">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </InputSelect>
+                <DataAnnotationsValidator />
 
-                <button type="submit">Update</button>
+                <div class="form-row">
+                    <label for="fn2">First Name</label>
+                    <InputText id="fn2" @bind-Value="EditModel.FirstName" />
+                    <ValidationMessage For="@(() => EditModel.FirstName)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="ln2">Last Name</label>
+                    <InputText id="ln2" @bind-Value="EditModel.LastName" />
+                    <ValidationMessage For="@(() => EditModel.LastName)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="em2">Email</label>
+                    <InputText id="em2" @bind-Value="EditModel.Email" />
+                    <ValidationMessage For="@(() => EditModel.Email)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="ph2">Phone</label>
+                    <InputText id="ph2" @bind-Value="EditModel.Phone" />
+                    <ValidationMessage For="@(() => EditModel.Phone)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="ed2">Enrollment Date</label>
+                    <InputDate id="ed2" @bind-Value="EditModel.EnrollmentDate" />
+                    <ValidationMessage For="@(() => EditModel.EnrollmentDate)" />
+                </div>
+
+                <div class="form-row">
+                    <label for="st2">Status</label>
+                    <InputSelect id="st2" @bind-Value="EditModel.Status">
+                        @foreach (var value in Enum.GetValues<PersonStatus>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => EditModel.Status)" />
+                </div>
+
+                <button type="submit">Save</button>
+                <button type="button" @onclick="DeleteStudent">Delete</button>
                 <button type="button" @onclick="ClearPanel">Cancel</button>
             </EditForm>
-        }
-
-        @if (ActivePanel == PanelType.Delete && SelectedStudent is not null)
-        {
-            <ModalConfirmation 
-                Message=$"Delete {SelectedStudent.FirstName} {SelectedStudent.LastName}?"
-                OnConfirm="DeleteStudent"
-                OnCancel="ClearPanel" />
         }
 
     </div>
@@ -81,42 +152,98 @@
 </div>
 
 @code {
-    // ENUM FOR PANEL STATE
-    enum PanelType { None, Add, Edit, Delete }
 
-    PanelType ActivePanel = PanelType.None;
+    private List<Student> StudentsData = new();
+    private Student? SelectedStudent;
 
-    List<Student> StudentList = new();
-    Student? SelectedStudent;
+    private Student AddModel = new();
+    private Student EditModel = new();
 
-    StudentFormModel AddModel = new();
-    StudentFormModel EditModel = new();
+    private string ActivePanel = "";
+    private string SearchText = "";
 
-    bool HasSelection => SelectedStudent is not null;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStudents();
+    }
 
-    void SelectStudent(Student s)
+    private async Task LoadStudents()
+    {
+        StudentsData = await Db.GetAllStudents();
+    }
+
+    private IEnumerable<Student> FilteredStudents =>
+        StudentsData.Where(s =>
+            string.IsNullOrWhiteSpace(SearchText) ||
+            s.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+            s.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+            s.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+        );
+
+    private void SelectStudent(Student s)
     {
         SelectedStudent = s;
-        EditModel = new StudentFormModel
+
+        EditModel = new Student
         {
+            Id = s.Id,
             FirstName = s.FirstName,
             LastName = s.LastName,
             Email = s.Email,
             Phone = s.Phone,
-            Status = s.Status
+            EnrollmentDate = s.EnrollmentDate,
+            Status = s.Status,
+            AssignedInstructorId = s.AssignedInstructorId
         };
+
+        ActivePanel = "edit";
     }
 
-    void ShowAddForm() => ActivePanel = PanelType.Add;
-    void ShowEditForm() => ActivePanel = PanelType.Edit;
-    void ShowDeleteConfirm() => ActivePanel = PanelType.Delete;
+    private void ShowAddPanel()
+    {
+        AddModel = new Student
+        {
+            EnrollmentDate = DateTime.Now,
+            Status = PersonStatus.Active
+        };
 
-    void ClearPanel() => ActivePanel = PanelType.None;
+        ActivePanel = "add";
+    }
 
-    string GetRowClass(Student s) =>
-        SelectedStudent == s ? "selected" : "";
+    private async Task AddStudent()
+    {
+        await Db.AddStudent(AddModel);
+        await LoadStudents();
+        ClearPanel();
+    }
 
-    Task AddStudent() => Task.CompletedTask;     // placeholder
-    Task UpdateStudent() => Task.CompletedTask;  // placeholder
-    Task DeleteStudent() => Task.CompletedTask;  // placeholder
+    private async Task UpdateStudent()
+    {
+        if (SelectedStudent is null)
+            return;
+
+        EditModel.Id = SelectedStudent.Id;
+
+        await Db.UpdateStudent(EditModel);
+        await LoadStudents();
+        ClearPanel();
+    }
+
+    private async Task DeleteStudent()
+    {
+        if (SelectedStudent is null)
+            return;
+
+        await Db.DeleteStudent(SelectedStudent.Id);
+        await LoadStudents();
+        ClearPanel();
+    }
+
+    private void ClearPanel()
+    {
+        SelectedStudent = null;
+        AddModel = new();
+        EditModel = new();
+        ActivePanel = "";
+    }
 }

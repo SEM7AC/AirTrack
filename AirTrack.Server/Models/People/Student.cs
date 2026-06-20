@@ -18,8 +18,10 @@ namespace AirTrack.Server.Models.People
         [Required]
         public string LastName { get; set; } = string.Empty;
 
-        [Required, EmailAddress]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+        ErrorMessage = "Please enter a valid email address.")]
         public string Email { get; set; } = string.Empty;
+
 
         [Phone]
         public string Phone { get; set; } = string.Empty;

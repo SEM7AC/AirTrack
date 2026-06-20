@@ -1,19 +1,19 @@
-﻿@page "/instructors"
+﻿@page "/mechanics"
 @rendermode InteractiveServer
 @using AirTrack.Server.Data
 @using AirTrack.Server.Models.People
 
 @inject DbHelper Db
 
-<div class="instructors-container">
+<div class="mechanics-container">
 
     <!-- LEFT LIST PANEL -->
     <div class="list-panel">
         <div class="header">
-            <h2>Instructors</h2>
+            <h2>Mechanics</h2>
 
             <div class="actions">
-                <button type="button" @onclick="ShowAddPanel">Add Instructor</button>
+                <button type="button" @onclick="ShowAddPanel">Add Mechanic</button>
             </div>
         </div>
 
@@ -25,13 +25,13 @@
                    @bind:event="oninput" />
         </div>
 
-        <ul class="instructor-list">
-            @foreach (var i in FilteredInstructors)
+        <ul class="mechanic-list">
+            @foreach (var m in FilteredMechanics)
             {
-                <li class="@(SelectedInstructor?.Id == i.Id ? "selected" : "")"
-                    @onclick="() => SelectInstructor(i)">
-                    <div class="name">@i.FirstName @i.LastName</div>
-                    <div class="sub">@i.Email</div>
+                <li class="@(SelectedMechanic?.Id == m.Id ? "selected" : "")"
+                    @onclick="() => SelectMechanic(m)">
+                    <div class="name">@m.FirstName @m.LastName</div>
+                    <div class="sub">@m.Email</div>
                 </li>
             }
         </ul>
@@ -42,9 +42,9 @@
 
         @if (ActivePanel == "add")
         {
-            <h3>Add Instructor</h3>
+            <h3>Add Mechanic</h3>
 
-            <EditForm Model="AddModel" OnValidSubmit="AddInstructor">
+            <EditForm Model="AddModel" OnValidSubmit="AddMechanic">
                 <DataAnnotationsValidator />
 
                 <div class="form-row">
@@ -71,8 +71,9 @@
                 </div>
 
                 <div class="form-row">
-                    <label>Certifications</label>
-                    <InputText @bind-Value="AddModel.Certifications" />
+                    <label>Certification Number</label>
+                    <InputText @bind-Value="AddModel.CertificationNumber" />
+                    <ValidationMessage For="@(() => AddModel.CertificationNumber)" />
                 </div>
 
                 <div class="form-row">
@@ -95,26 +96,29 @@
             </EditForm>
         }
 
-        @if (ActivePanel == "edit" && SelectedInstructor is not null)
+        @if (ActivePanel == "edit" && SelectedMechanic is not null)
         {
-            <h3>Edit Instructor</h3>
+            <h3>Edit Mechanic</h3>
 
-            <EditForm Model="EditModel" OnValidSubmit="UpdateInstructor">
+            <EditForm Model="EditModel" OnValidSubmit="UpdateMechanic">
                 <DataAnnotationsValidator />
 
                 <div class="form-row">
                     <label>First Name</label>
                     <InputText @bind-Value="EditModel.FirstName" />
+                    <ValidationMessage For="@(() => EditModel.FirstName)" />
                 </div>
 
                 <div class="form-row">
                     <label>Last Name</label>
                     <InputText @bind-Value="EditModel.LastName" />
+                    <ValidationMessage For="@(() => EditModel.LastName)" />
                 </div>
 
                 <div class="form-row">
                     <label>Email</label>
                     <InputText @bind-Value="EditModel.Email" />
+                    <ValidationMessage For="@(() => EditModel.Email)" />
                 </div>
 
                 <div class="form-row">
@@ -123,8 +127,9 @@
                 </div>
 
                 <div class="form-row">
-                    <label>Certifications</label>
-                    <InputText @bind-Value="EditModel.Certifications" />
+                    <label>Certification Number</label>
+                    <InputText @bind-Value="EditModel.CertificationNumber" />
+                    <ValidationMessage For="@(() => EditModel.CertificationNumber)" />
                 </div>
 
                 <div class="form-row">
@@ -143,7 +148,7 @@
                 </div>
 
                 <button type="submit">Save</button>
-                <button type="button" @onclick="DeleteInstructor">Delete</button>
+                <button type="button" @onclick="DeleteMechanic">Delete</button>
                 <button type="button" @onclick="ClearPanel">Cancel</button>
             </EditForm>
         }
@@ -154,47 +159,47 @@
 
 @code {
 
-    private List<Instructor> InstructorsData = new();
-    private Instructor? SelectedInstructor;
+    private List<Mechanic> MechanicsData = new();
+    private Mechanic? SelectedMechanic;
 
-    private Instructor AddModel = new();
-    private Instructor EditModel = new();
+    private Mechanic AddModel = new();
+    private Mechanic EditModel = new();
 
     private string ActivePanel = "";
     private string SearchText = "";
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadInstructors();
+        await LoadMechanics();
     }
 
-    private async Task LoadInstructors()
+    private async Task LoadMechanics()
     {
-        InstructorsData = await Db.GetAllInstructors();
+        MechanicsData = await Db.GetAllMechanics();
     }
 
-    private IEnumerable<Instructor> FilteredInstructors =>
-        InstructorsData.Where(i =>
+    private IEnumerable<Mechanic> FilteredMechanics =>
+        MechanicsData.Where(m =>
             string.IsNullOrWhiteSpace(SearchText) ||
-            i.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            i.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            i.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+            m.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+            m.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+            m.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
         );
 
-    private void SelectInstructor(Instructor i)
+    private void SelectMechanic(Mechanic m)
     {
-        SelectedInstructor = i;
+        SelectedMechanic = m;
 
-        EditModel = new Instructor
+        EditModel = new Mechanic
         {
-            Id = i.Id,
-            FirstName = i.FirstName,
-            LastName = i.LastName,
-            Email = i.Email,
-            Phone = i.Phone,
-            Certifications = i.Certifications,
-            HireDate = i.HireDate,
-            Status = i.Status
+            Id = m.Id,
+            FirstName = m.FirstName,
+            LastName = m.LastName,
+            Email = m.Email,
+            Phone = m.Phone,
+            CertificationNumber = m.CertificationNumber,
+            HireDate = m.HireDate,
+            Status = m.Status
         };
 
         ActivePanel = "edit";
@@ -202,7 +207,7 @@
 
     private void ShowAddPanel()
     {
-        AddModel = new Instructor
+        AddModel = new Mechanic
         {
             HireDate = DateTime.Now,
             Status = PersonStatus.Active
@@ -211,38 +216,38 @@
         ActivePanel = "add";
     }
 
-    private async Task AddInstructor()
+    private async Task AddMechanic()
     {
-        await Db.AddInstructor(AddModel);
-        await LoadInstructors();
+        await Db.AddMechanic(AddModel);
+        await LoadMechanics();
         ClearPanel();
     }
 
-    private async Task UpdateInstructor()
+    private async Task UpdateMechanic()
     {
-        if (SelectedInstructor is null)
+        if (SelectedMechanic is null)
             return;
 
-        EditModel.Id = SelectedInstructor.Id;
+        EditModel.Id = SelectedMechanic.Id;
 
-        await Db.UpdateInstructor(EditModel);
-        await LoadInstructors();
+        await Db.UpdateMechanic(EditModel);
+        await LoadMechanics();
         ClearPanel();
     }
 
-    private async Task DeleteInstructor()
+    private async Task DeleteMechanic()
     {
-        if (SelectedInstructor is null)
+        if (SelectedMechanic is null)
             return;
 
-        await Db.DeleteInstructor(SelectedInstructor.Id);
-        await LoadInstructors();
+        await Db.DeleteMechanic(SelectedMechanic.Id);
+        await LoadMechanics();
         ClearPanel();
     }
 
     private void ClearPanel()
     {
-        SelectedInstructor = null;
+        SelectedMechanic = null;
         AddModel = new();
         EditModel = new();
         ActivePanel = "";
