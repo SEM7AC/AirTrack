@@ -16,3 +16,12 @@
         right: 0.75rem;
         top: 0.5rem;
     }
+
+app-content,
+.app-content {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
