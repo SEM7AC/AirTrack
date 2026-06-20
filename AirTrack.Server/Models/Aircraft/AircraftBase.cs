@@ -10,30 +10,36 @@
 
     public abstract class AircraftBase
         {
-        // EF CORE Identity
+        // EF Core Identity
         public int Id { get; set; }
 
-        // Identity
+        // Identity / Configuration
         public string TailNumber { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
+        public int Year { get; set; }
+        public string EngineType { get; set; } = string.Empty;
+        public string FuelType { get; set; } = string.Empty;
+        public int Seats { get; set; }
+        public string Notes { get; set; } = string.Empty;
 
         // Operational Time
         public decimal Hobbs { get; set; }
         public decimal Tach { get; set; }
 
-        // Universal Maintenance
+        // Maintenance
         public DateTime AnnualDueDate { get; set; }
         public int SquawkCount { get; set; }
 
-        // Status
+        // Status & Equipment
         public AircraftStatus Status { get; set; }
+        public OptionalEquipment Equipment { get; set; }
 
-        // Current Flight
+        // Current Flight (runtime)
         public string CurrentStudent { get; set; } = string.Empty;
         public string CurrentInstructor { get; set; } = string.Empty;
         public DateTime? CurrentFlightStart { get; set; }
 
-        // Scheduling
+        // Scheduling (runtime)
         public DateTime? NextBookingStart { get; set; }
         public DateTime? NextBookingEnd { get; set; }
         }

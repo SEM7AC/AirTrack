@@ -20,6 +20,13 @@ namespace AirTrack.Server.Data
             await _context.SaveChangesAsync();
             }
 
+        // UPDATE AIRCRAFT
+        public async Task UpdateAircraft(AircraftBase aircraft)
+            {
+            _context.AircraftBases.Update(aircraft);
+            await _context.SaveChangesAsync();
+            }
+
         // DELETE AIRCRAFT
         public async Task DeleteAircraft(int id)
             {
