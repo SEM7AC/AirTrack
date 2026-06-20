@@ -1,0 +1,122 @@
+﻿@page "/students"
+@rendermode InteractiveServer
+@using AirTrack.Server.Models.FormModel
+@using AirTrack.Server.Models.People
+@using AirTrack.Server.Components.UI
+
+<div class="students-container">
+
+    <!-- LEFT SIDE LIST -->
+    <div class="list-panel">
+        <h2>Students</h2>
+
+        <div class="actions">
+            <button @onclick="ShowAddForm">Add</button>
+            <button @onclick="ShowEditForm" disabled="@(!HasSelection)">Edit</button>
+            <button @onclick="ShowDeleteConfirm" disabled="@(!HasSelection)">Delete</button>
+        </div>
+
+        <ul class="student-list">
+            @foreach (var s in StudentList)
+            {
+                <li class="@GetRowClass(s)" @onclick="() => SelectStudent(s)">
+                    <div class="name">@s.FirstName @s.LastName</div>
+                    <div class="email">@s.Email</div>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- RIGHT SIDE DYNAMIC PANEL -->
+    <div class="detail-panel">
+
+        @if (ActivePanel == PanelType.Add)
+        {
+            <h3>Add Student</h3>
+
+            <EditForm Model="AddModel" OnValidSubmit="AddStudent">
+                <InputText @bind-Value="AddModel.FirstName" placeholder="First Name" />
+                <InputText @bind-Value="AddModel.LastName" placeholder="Last Name" />
+                <InputText @bind-Value="AddModel.Email" placeholder="Email" />
+                <InputText @bind-Value="AddModel.Phone" placeholder="Phone" />
+                <InputSelect @bind-Value="AddModel.Status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </InputSelect>
+
+                <button type="submit">Save</button>
+                <button type="button" @onclick="ClearPanel">Cancel</button>
+            </EditForm>
+        }
+
+        @if (ActivePanel == PanelType.Edit && SelectedStudent is not null)
+        {
+            <h3>Edit Student</h3>
+
+            <EditForm Model="EditModel" OnValidSubmit="UpdateStudent">
+                <InputText @bind-Value="EditModel.FirstName" />
+                <InputText @bind-Value="EditModel.LastName" />
+                <InputText @bind-Value="EditModel.Email" />
+                <InputText @bind-Value="EditModel.Phone" />
+                <InputSelect @bind-Value="EditModel.Status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </InputSelect>
+
+                <button type="submit">Update</button>
+                <button type="button" @onclick="ClearPanel">Cancel</button>
+            </EditForm>
+        }
+
+        @if (ActivePanel == PanelType.Delete && SelectedStudent is not null)
+        {
+            <ModalConfirmation 
+                Message=$"Delete {SelectedStudent.FirstName} {SelectedStudent.LastName}?"
+                OnConfirm="DeleteStudent"
+                OnCancel="ClearPanel" />
+        }
+
+    </div>
+
+</div>
+
+@code {
+    // ENUM FOR PANEL STATE
+    enum PanelType { None, Add, Edit, Delete }
+
+    PanelType ActivePanel = PanelType.None;
+
+    List<Student> StudentList = new();
+    Student? SelectedStudent;
+
+    StudentFormModel AddModel = new();
+    StudentFormModel EditModel = new();
+
+    bool HasSelection => SelectedStudent is not null;
+
+    void SelectStudent(Student s)
+    {
+        SelectedStudent = s;
+        EditModel = new StudentFormModel
+        {
+            FirstName = s.FirstName,
+            LastName = s.LastName,
+            Email = s.Email,
+            Phone = s.Phone,
+            Status = s.Status
+        };
+    }
+
+    void ShowAddForm() => ActivePanel = PanelType.Add;
+    void ShowEditForm() => ActivePanel = PanelType.Edit;
+    void ShowDeleteConfirm() => ActivePanel = PanelType.Delete;
+
+    void ClearPanel() => ActivePanel = PanelType.None;
+
+    string GetRowClass(Student s) =>
+        SelectedStudent == s ? "selected" : "";
+
+    Task AddStudent() => Task.CompletedTask;     // placeholder
+    Task UpdateStudent() => Task.CompletedTask;  // placeholder
+    Task DeleteStudent() => Task.CompletedTask;  // placeholder
+}

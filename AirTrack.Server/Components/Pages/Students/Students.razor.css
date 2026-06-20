@@ -1,0 +1,132 @@
+﻿/* layout */
+.students-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: 100%;
+    background-color: #0A1A2F;
+    color: #E8F1FF;
+}
+
+/* sidebar */
+.list-panel {
+    background-color: #0A1A2F;
+    border-right: 1px solid #1F2E45;
+    padding: 20px;
+}
+
+    .list-panel h2 {
+        color: #E8F1FF;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 14px;
+    }
+
+/* sidebar actions */
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+    .actions button {
+        padding: 10px 14px;
+        background-color: #4CC2FF;
+        border: none;
+        border-radius: 6px;
+        color: #0A1A2F;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.15s ease;
+    }
+
+        .actions button:hover {
+            background-color: #76d8ff;
+            box-shadow: 0 0 8px #4CC2FF55;
+        }
+
+        .actions button[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+/* sidebar list */
+.student-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+    /* student cards */
+    .student-list li {
+        background-color: #0D2238;
+        border: 1px solid #1F2E45;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 0 10px #000;
+        cursor: pointer;
+        transition: 0.15s ease;
+    }
+
+        .student-list li:hover {
+            background-color: #103054;
+            border-color: #4CC2FF55;
+        }
+
+        .student-list li.selected {
+            background-color: #103054;
+            border-left: 4px solid #4CC2FF;
+        }
+
+/* content */
+.detail-panel {
+    padding: 30px;
+    background-color: #0D2238;
+}
+
+    .detail-panel h3 {
+        color: #E8F1FF;
+        margin-bottom: 20px;
+    }
+
+/* inputs */
+input,
+select {
+    background-color: #0A1A2F;
+    border: 1px solid #1F2E45;
+    color: #E8F1FF;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    width: 100%;
+}
+
+    input:focus,
+    select:focus {
+        border-color: #4CC2FF;
+        box-shadow: 0 0 6px #4CC2FF55;
+        outline: none;
+    }
+
+/* form buttons */
+button[type="submit"],
+button[type="button"] {
+    padding: 12px 18px;
+    background-color: #4CC2FF;
+    border: none;
+    border-radius: 6px;
+    color: #0A1A2F;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s ease;
+    margin-right: 10px;
+}
+
+    button[type="submit"]:hover,
+    button[type="button"]:hover {
+        background-color: #76d8ff;
+        box-shadow: 0 0 8px #4CC2FF55;
+    }
