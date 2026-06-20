@@ -1,0 +1,148 @@
+﻿@page "/aircraft/edit"
+
+@using AirTrack.Server.Data
+@using AirTrack.Server.Models.Aircraft
+@inject DbHelper Db
+
+<div class="edit-layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-title">Aircraft</div>
+
+        <input class="search-box form-control"
+               placeholder="Search..."
+               @bind="SearchText"
+               @bind:event="oninput" />
+
+        <div class="aircraft-list-scroll">
+            @foreach (var ac in FilteredAircraft)
+            {
+                <div class="aircraft-item @(Selected?.Id == ac.Id ? "selected" : "")"
+                     @onclick="() => LoadAircraft(ac)">
+                    <div class="tail">@ac.TailNumber</div>
+                    <div class="model">@ac.Model</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+
+        @if (Selected is null)
+        {
+            <div class="placeholder">Select an aircraft to edit</div>
+        }
+        else
+        {
+            <div class="edit-card">
+
+                <h2>Edit Aircraft</h2>
+
+                <div class="form-grid">
+
+                    <!-- LEFT COLUMN -->
+                    <div class="form-col">
+
+                        <div class="form-group">
+                            <label>Tail Number</label>
+                            <input class="form-control" @bind="Selected.TailNumber" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Model</label>
+                            <input class="form-control" @bind="Selected.Model" disabled />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hobbs</label>
+                            <input type="number" class="form-control" @bind="Selected.Hobbs" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tach</label>
+                            <input type="number" class="form-control" @bind="Selected.Tach" />
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="form-col">
+
+                        <div class="form-group">
+                            <label>Annual Due</label>
+                            <input type="date" class="form-control" @bind="Selected.AnnualDueDate" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-select" @bind="Selected.Status">
+                                <option value="Available">Available</option>
+                                <option value="InFlight">In Flight</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Squawk Count</label>
+                            <input type="number" class="form-control" @bind="Selected.SquawkCount" disabled />
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <button class="save-btn" @onclick="SaveAircraft">Save Changes</button>
+
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<AircraftBase> AircraftList = new();
+    private List<AircraftBase> FilteredAircraft = new();
+    private AircraftBase? Selected;
+
+    private string SearchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AircraftList = await Db.GetAllAircraft();
+        FilteredAircraft = AircraftList;
+    }
+
+    private void LoadAircraft(AircraftBase ac)
+    {
+        Selected = ac;
+    }
+
+    private async Task SaveAircraft()
+    {
+        if (Selected is null)
+            return;
+
+        await Db.UpdateAircraft(Selected);
+
+        AircraftList = await Db.GetAllAircraft();
+        ApplySearch();
+    }
+
+    private void ApplySearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredAircraft = AircraftList;
+        }
+        else
+        {
+            FilteredAircraft = AircraftList
+                .Where(a =>
+                    a.TailNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    a.Model.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+}

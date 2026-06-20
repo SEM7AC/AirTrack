@@ -1,14 +1,10 @@
-﻿/* ============================================================
-   LAYOUT
-   ============================================================ */
+﻿/* layout */
 .add-layout {
     display: flex;
     height: 100%;
 }
 
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
+/* sidebar */
 .sidebar {
     width: 280px;
     background-color: #0A1A2F;
@@ -29,14 +25,14 @@
     font-size: 0.9rem;
 }
 
-/* Scrollable session list */
+/* sidebar list */
 .session-list-scroll {
     height: calc(100vh - 150px);
     overflow-y: auto;
     padding-right: 6px;
 }
 
-/* Dashboard-style session cards */
+/* session cards */
 .session-item {
     background-color: #0D2238;
     border: 1px solid #1F2E45;
@@ -58,18 +54,14 @@
         margin-top: 4px;
     }
 
-/* ============================================================
-   MAIN CONTENT
-   ============================================================ */
+/* main content */
 .content {
     flex: 1;
     padding: 30px;
     color: #E8F1FF;
 }
 
-/* ============================================================
-   ADD CARD
-   ============================================================ */
+/* add card */
 .add-card {
     background-color: #0D2238;
     border: 1px solid #1F2E45;
@@ -83,9 +75,7 @@
         color: #E8F1FF;
     }
 
-/* ============================================================
-   FORM LAYOUT
-   ============================================================ */
+/* form layout */
 .form-row {
     display: flex;
     gap: 20px;
@@ -107,7 +97,7 @@ label {
     color: #E8F1FF;
 }
 
-/* Inputs */
+/* inputs */
 .form-control,
 .form-select {
     background-color: #0A1A2F;
@@ -121,9 +111,7 @@ label {
         box-shadow: 0 0 6px #4CC2FF55;
     }
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
+/* save button */
 .save-btn {
     margin-top: 10px;
     padding: 12px 18px;

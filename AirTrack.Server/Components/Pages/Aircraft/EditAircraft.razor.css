@@ -1,5 +1,5 @@
 ﻿/* layout */
-.delete-layout {
+.add-layout {
     display: flex;
     height: 100%;
 }
@@ -75,30 +75,50 @@
     color: #E8F1FF;
 }
 
-.placeholder {
-    opacity: 0.6;
-    font-size: 1.1rem;
-}
-
-/* delete card */
-.delete-card {
+.form-card {
     background-color: #0D2238;
     border: 1px solid #1F2E45;
     padding: 25px;
     border-radius: 8px;
-    max-width: 420px;
+    max-width: 520px;
 }
 
-    .delete-card h2 {
-        margin-bottom: 15px;
-        color: #E8F1FF;
+/* form fields */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+}
+
+    .form-grid label {
+        font-size: 0.9rem;
+        opacity: 0.85;
     }
 
-/* delete button */
-.delete-btn {
+    .form-grid input,
+    .form-grid select,
+    .form-grid textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #1F2E45;
+        background-color: #0A1A2F;
+        color: #E8F1FF;
+        transition: border-color 0.15s ease;
+    }
+
+        .form-grid input:focus,
+        .form-grid select:focus,
+        .form-grid textarea:focus {
+            border-color: #4CC2FF;
+            outline: none;
+        }
+
+/* save button */
+.save-btn {
     margin-top: 20px;
     padding: 12px 18px;
-    background-color: #C62828;
+    background-color: #2E7D32;
     border: none;
     border-radius: 6px;
     color: white;
@@ -107,7 +127,8 @@
     transition: 0.15s ease;
 }
 
-    .delete-btn:hover {
-        background-color: #E53935;
-        box-shadow: 0 0 8px #E5393555;
+    .save-btn:hover {
+        background-color: #388E3C;
+        box-shadow: 0 0 8px #388E3C55;
     }
+

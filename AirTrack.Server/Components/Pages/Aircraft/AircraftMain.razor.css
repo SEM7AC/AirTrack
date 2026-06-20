@@ -1,22 +1,18 @@
-﻿/* ============================================================
-   ACTION CARD LAYOUT
-   ============================================================ */
+﻿/* action card layout */
 .action-container {
     display: flex;
     gap: 20px;
     margin-top: 30px;
 }
 
-/* ============================================================
-   ACTION CARDS (Base Style)
-   ============================================================ */
+/* action cards (base style) */
 .action-card {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 220px; /* Big square cards */
+    height: 220px;
     padding: 20px;
     background: #ffffff;
     border: 2px solid #ccc;
@@ -28,22 +24,20 @@
     transition: border-color 0.2s ease, transform 0.1s ease;
 }
 
-    /* Hover animation */
+    /* hover animation */
     .action-card:hover {
         transform: scale(1.03);
     }
 
-    /* ============================================================
-   ACTION CARD VARIANTS (Color Accents)
-   ============================================================ */
+    /* action card variants */
     .action-card.add:hover {
-        border-color: #007bff; /* Blue */
+        border-color: #007bff;
     }
 
     .action-card.edit:hover {
-        border-color: #ffc107; /* Yellow */
+        border-color: #ffc107;
     }
 
     .action-card.delete:hover {
-        border-color: #dc3545; /* Red */
+        border-color: #dc3545;
     }
