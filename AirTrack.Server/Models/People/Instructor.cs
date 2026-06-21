@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AirTrack.Server.Models.People
     {
@@ -31,5 +32,9 @@ namespace AirTrack.Server.Models.People
         public PersonStatus Status { get; set; } = PersonStatus.Active;
 
         public List<Student> Students { get; set; } = new();
+
+        [NotMapped]
+        public string FullName => $"{FirstName} {LastName}";
+
         }
     }

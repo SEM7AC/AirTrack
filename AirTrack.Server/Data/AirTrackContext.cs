@@ -1,6 +1,7 @@
 ﻿using AirTrack.Server.Models.Aircraft;
 using AirTrack.Server.Models.Maintenance;
 using AirTrack.Server.Models.People;
+using AirTrack.Server.Models.Scheduler;
 using Microsoft.EntityFrameworkCore;
 
 namespace AirTrack.Server.Data
@@ -59,6 +60,10 @@ namespace AirTrack.Server.Data
         public DbSet<Mechanic> Mechanics { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
         public DbSet <Student> Students { get; set; }
+
+        // Scheduler
+        public DbSet<FlightEvent> FlightEvents { get; set; }
+
 
 
         }

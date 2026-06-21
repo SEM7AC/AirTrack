@@ -1,14 +1,14 @@
 ﻿@page "/"
-
+@rendermode InteractiveServer
 @using AirTrack.Server.Components.UI;
 @using AirTrack.Server.Models.Aircraft
 @using AirTrack.Server.Data;
+@using AirTrack.Server.Models.Scheduler
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.EntityFrameworkCore;
 @inject DbHelper Db
 
 <PageTitle>AirTrack - Dashboard</PageTitle>
-
 
 @if (AircraftList is null)
 {
@@ -24,18 +24,98 @@ else
         <div class="aircraft-grid">
             @foreach (var plane in AircraftList)
             {
-                <AircraftCard Aircraft="plane" />
+                <AircraftCard @key="plane.Id" Aircraft="plane" />
+
             }
         </div>
     </div>
 }
 
 @code {
-    
     private List<AircraftBase> AircraftList = new();
+    private List<FlightEvent> Events = new();
+
+    private System.Timers.Timer _timer;
 
     protected override async Task OnInitializedAsync()
     {
-        AircraftList = await Db.GetAllAircraft();
+        await LoadData(); // loads BEFORE first render
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
+    {
+        _timer = new System.Timers.Timer(15000);
+        _timer.Elapsed += async (_, _) =>
+        {
+            await LoadData();
+            await InvokeAsync(StateHasChanged);
+        };
+
+        _timer.AutoReset = true;
+        _timer.Start();
     }
 }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            AircraftList = await Db.GetAllAircraft();
+            Events = await Db.GetAllEvents();
+
+            foreach (var plane in AircraftList)
+                plane.Status = GetStatus(plane);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Dashboard load error: " + ex.Message);
+        }
+    }
+
+    int InFlightCount => AircraftList.Count(a => IsInFlight(a));
+    int ScheduledCount => AircraftList.Count(a => IsScheduled(a));
+
+    bool IsInFlight(AircraftBase a)
+    {
+        var now = DateTime.Now;
+        return Events.Any(e =>
+            e.AircraftId == a.Id &&
+            e.Start <= now &&
+            e.End >= now
+        );
+    }
+
+    bool IsScheduled(AircraftBase a)
+    {
+        var now = DateTime.Now;
+        return Events.Any(e =>
+            e.AircraftId == a.Id &&
+            e.Start > now
+        );
+    }
+
+    private AircraftStatus GetStatus(AircraftBase a)
+    {
+        var now = DateTime.Now;
+
+        var evt = Events
+            .Where(e => e.AircraftId == a.Id)
+            .OrderBy(e => e.Start)
+            .FirstOrDefault();
+
+        if (evt is null)
+            return AircraftStatus.Available;
+
+        if (now < evt.Start)
+            return AircraftStatus.Scheduled;
+
+        if (now >= evt.Start && now <= evt.End)
+            return AircraftStatus.InFlight;
+
+        return AircraftStatus.Available;
+    }
+}
+

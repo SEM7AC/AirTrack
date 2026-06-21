@@ -1,0 +1,36 @@
+﻿<div class="datetime-editor">
+    <InputDate @bind-Value="Date" />
+
+    <input type="time"
+           value="@TimeString"
+           @onchange="OnTimeChanged" />
+</div>
+
+@code {
+    [Parameter] public DateTime Value { get; set; }
+    [Parameter] public EventCallback<DateTime> ValueChanged { get; set; }
+
+    private DateTime Date
+    {
+        get => Value.Date;
+        set => Update(value, Value.TimeOfDay);
+    }
+
+    private string TimeString
+        => Value.ToString("HH:mm");
+
+    private void OnTimeChanged(ChangeEventArgs e)
+    {
+        if (TimeSpan.TryParse(e.Value?.ToString(), out var time))
+        {
+            Update(Value.Date, time);
+        }
+    }
+
+    private void Update(DateTime date, TimeSpan time)
+    {
+        var combined = date.Date + time;
+        Value = combined;
+        ValueChanged.InvokeAsync(combined);
+    }
+}

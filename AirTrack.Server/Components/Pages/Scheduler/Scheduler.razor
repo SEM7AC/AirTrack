@@ -1,0 +1,336 @@
+﻿@page "/schedule"
+@rendermode InteractiveServer
+@using AirTrack.Server.Data
+@using AirTrack.Server.Models.Aircraft
+@using AirTrack.Server.Models.People
+@using AirTrack.Server.Models.Scheduler
+@using AirTrack.Server.Models.FormModel
+@using AirTrack.Server.Components
+@using AirTrack.Server.Components.UI
+
+@inject DbHelper Db
+
+<div class="page">
+
+    <h2>Scheduler</h2>
+    
+    <div class="top-buttons">
+        <button type="button" @onclick="OpenAddDrawer">Add</button>
+        <button type="button" @onclick="OpenEditDrawer">Edit</button>
+        <button type="button" @onclick="OpenDeleteDrawer">Delete</button>
+        <span class="event-count">Total: @Events.Count</span>
+    </div>
+
+    <div class="scheduler-container">
+        <div class="scroll-area">
+
+            <div class="timeline">
+                @for (int hour = 0; hour < 24; hour++)
+                {
+                    <div class="timeline-hour">@hour.ToString("00"):00</div>
+                }
+            </div>
+
+            <div class="aircraft-columns">
+                @foreach (var ac in AircraftList)
+                {
+                    <div class="aircraft-column">
+                        <div class="aircraft-header">@ac.TailNumber</div>
+
+                        @foreach (var ev in Events.Where(e => e.AircraftId == ac.Id))
+                        {
+                            <div @key="ev.Id" class="event-sample" style="@GetEventStyle(ev)">
+                                @RenderEventLabel(ev)
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    @if (ShowDrawer)
+    {
+        <div class="drawer">
+            <h3>@DrawerTitle</h3>
+
+            <label>Aircraft</label>
+            <select value="@SelectedAircraftId" @onchange="OnAircraftChangedHandler">
+                <option value="">-- Select Aircraft --</option>
+                @foreach (var ac in AircraftList)
+                {
+                    <option value="@ac.Id">@ac.TailNumber</option>
+                }
+            </select>
+
+            @if (IsEditing || IsDeleting)
+            {
+                <label>Event</label>
+                <select value="@SelectedEventId" @onchange="OnEventChangedHandler">
+                    <option value="">-- Select Event --</option>
+                    @foreach (var ev in FilteredEvents)
+                    {
+                        <option value="@ev.Id">@($"{ev.Start:HH:mm}-{ev.End:HH:mm}")</option>
+                    }
+                </select>
+            }
+
+            @if (!IsDeleting)
+            {
+                <label>Instructor</label>
+                <select @bind="CurrentEvent.InstructorId">
+                    <option value="">-- None --</option>
+                    @foreach (var inst in Instructors)
+                    {
+                        <option value="@inst.Id">@inst.FullName</option>
+                    }
+                </select>
+
+                <label>Student</label>
+                <select @bind="CurrentEvent.StudentId">
+                    <option value="">-- None --</option>
+                    @foreach (var stu in Students)
+                    {
+                        <option value="@stu.Id">@stu.FullName</option>
+                    }
+                </select>
+
+                <label>Mechanic</label>
+                <select @bind="CurrentEvent.MechanicId">
+                    <option value="">-- None --</option>
+                    @foreach (var mech in Mechanics)
+                    {
+                        <option value="@mech.Id">@($"{mech.FirstName} {mech.LastName}")</option>
+                    }
+                </select>
+
+                <label>Start</label>
+                <DateTimeEditor @bind-Value="CurrentEvent.Start" />
+
+                <label>End</label>
+                <DateTimeEditor @bind-Value="CurrentEvent.End" />
+            }
+
+            @if (IsDeleting)
+            {
+                <button type="button" class="delete" @onclick="ConfirmDelete">Delete</button>
+            }
+            else
+            {
+                <button type="button" @onclick="SaveEvent">Save</button>
+            }
+
+            <button type="button" @onclick="CloseDrawer">Cancel</button>
+        </div>
+    }
+
+</div>
+
+@code {
+    List<AircraftBase> AircraftList = new();
+    List<Instructor> Instructors = new();
+    List<Student> Students = new();
+    List<Mechanic> Mechanics = new();
+    List<FlightEvent> Events = new();
+    List<FlightEvent> FilteredEvents = new();
+
+    FlightEventFormModel CurrentEvent = new();
+
+    int? SelectedAircraftId { get; set; }
+    int? SelectedEventId { get; set; }
+
+    bool ShowDrawer = false;
+    bool IsEditing = false;
+    bool IsDeleting = false;
+    string DrawerTitle = "";
+
+    DateTime CurrentSchedulerDate { get; set; } = DateTime.Today;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        AircraftList = await Db.GetAllAircraft();
+        Instructors = await Db.GetAllInstructors();
+        Students = await Db.GetAllStudents();
+        Mechanics = await Db.GetAllMechanics();
+        Events = await Db.GetAllEvents();
+    }
+
+    void OpenAddDrawer()
+    {
+        DrawerTitle = "Add Event";
+        IsEditing = false;
+        IsDeleting = false;
+
+        SelectedAircraftId = null;
+        SelectedEventId = null;
+
+        CurrentEvent = new FlightEventFormModel
+        {
+            Start = CurrentSchedulerDate.Date.AddHours(8),
+            End = CurrentSchedulerDate.Date.AddHours(9)
+        };
+
+        FilteredEvents = new();
+        ShowDrawer = true;
+    }
+
+    void OpenEditDrawer()
+    {
+        DrawerTitle = "Edit Event";
+        IsEditing = true;
+        IsDeleting = false;
+
+        SelectedAircraftId = null;
+        SelectedEventId = null;
+
+        CurrentEvent = new FlightEventFormModel
+        {
+            Start = CurrentSchedulerDate.Date.AddHours(8),
+            End = CurrentSchedulerDate.Date.AddHours(9)
+        };
+
+        FilteredEvents = new();
+        ShowDrawer = true;
+    }
+
+    void OpenDeleteDrawer()
+    {
+        DrawerTitle = "Delete Event";
+        IsEditing = false;
+        IsDeleting = true;
+
+        SelectedAircraftId = null;
+        SelectedEventId = null;
+
+        CurrentEvent = new FlightEventFormModel
+        {
+            Start = CurrentSchedulerDate.Date,
+            End = CurrentSchedulerDate.Date
+        };
+
+        FilteredEvents = new();
+        ShowDrawer = true;
+    }
+
+    void OnAircraftChangedHandler(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+        {
+            SelectedAircraftId = id;
+
+            // ⭐ REQUIRED FIX — THIS WAS MISSING
+            CurrentEvent.AircraftId = id;
+
+            FilteredEvents = Events.Where(ev => ev.AircraftId == id).ToList();
+        }
+        else
+        {
+            SelectedAircraftId = null;
+            CurrentEvent.AircraftId = null;
+            FilteredEvents = new();
+        }
+    }
+
+    void OnEventChangedHandler(ChangeEventArgs e)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var id))
+            return;
+
+        SelectedEventId = id;
+
+        var ev = Events.First(x => x.Id == id);
+
+        CurrentEvent = new FlightEventFormModel
+        {
+            Id = ev.Id,
+            AircraftId = ev.AircraftId,
+            InstructorId = ev.InstructorId,
+            StudentId = ev.StudentId,
+            MechanicId = ev.MechanicId,
+            Start = ev.Start,
+            End = ev.End
+        };
+
+        CurrentSchedulerDate = ev.Start.Date;
+    }
+
+    async Task SaveEvent()
+    {
+        // ⭐ REQUIRED FIX — DO NOT SAVE AircraftId = 0
+        if (CurrentEvent.AircraftId is null)
+            return;
+
+        var entity = new FlightEvent
+        {
+            Id = CurrentEvent.Id ?? 0,
+            AircraftId = CurrentEvent.AircraftId.Value,
+            InstructorId = CurrentEvent.InstructorId,
+            StudentId = CurrentEvent.StudentId,
+            MechanicId = CurrentEvent.MechanicId,
+            Start = CurrentEvent.Start,
+            End = CurrentEvent.End
+        };
+
+        if (IsEditing)
+            await Db.UpdateEvent(entity);
+        else
+            await Db.AddEvent(entity);
+
+        AircraftList = await Db.GetAllAircraft();
+        Events = await Db.GetAllEvents();
+        Instructors = await Db.GetAllInstructors();
+        Students = await Db.GetAllStudents();
+        Mechanics = await Db.GetAllMechanics();
+
+        CloseDrawer();
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (SelectedEventId is int id)
+            await Db.DeleteEvent(id);
+
+        Events = await Db.GetAllEvents();
+        CloseDrawer();
+    }
+
+    void CloseDrawer()
+    {
+        ShowDrawer = false;
+    }
+
+    string GetEventStyle(FlightEvent ev)
+    {
+        double hourHeight = 60;
+        double pxPerMinute = hourHeight / 60.0;
+
+        var start = ev.Start;
+        var end = ev.End;
+
+        double startOffset = Math.Ceiling(start.TimeOfDay.TotalMinutes * pxPerMinute);
+        double duration = Math.Ceiling((end - start).TotalMinutes * pxPerMinute);
+
+        if (duration < 15)
+            duration = 15;
+
+        return $"top:{startOffset}px;height:{duration}px;";
+    }
+
+    string RenderEventLabel(FlightEvent ev)
+    {
+        var instructor = Instructors.FirstOrDefault(i => i.Id == ev.InstructorId);
+        var student = Students.FirstOrDefault(s => s.Id == ev.StudentId);
+
+        if (instructor is not null && student is not null)
+            return $"{instructor.LastName}/{student.LastName}";
+
+        if (instructor is not null)
+            return instructor.LastName;
+
+        if (student is not null)
+            return student.LastName;
+
+        return $"{ev.Start:HH:mm}-{ev.End:HH:mm}";
+    }
+}

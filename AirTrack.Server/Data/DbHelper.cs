@@ -1,6 +1,7 @@
 ﻿using AirTrack.Server.Data;
 using AirTrack.Server.Models.Aircraft;
 using AirTrack.Server.Models.People;
+using AirTrack.Server.Models.Scheduler;
 using Microsoft.EntityFrameworkCore;
 
 namespace AirTrack.Server.Data
@@ -180,6 +181,48 @@ namespace AirTrack.Server.Data
             {
             return await _context.Mechanics.FindAsync(id);
             }
+
+        // ADD EVENT
+        public async Task AddEvent(FlightEvent evt)
+            {
+            _context.FlightEvents.Add(evt);
+            await _context.SaveChangesAsync();
+            }
+
+        // UPDATE EVENT
+        public async Task UpdateEvent(FlightEvent updated)
+            {
+            var existing = await _context.FlightEvents.FindAsync(updated.Id);
+            if (existing == null)
+                return;
+
+            _context.Entry(existing).CurrentValues.SetValues(updated);
+            await _context.SaveChangesAsync();
+            }
+
+        // DELETE EVENT
+        public async Task DeleteEvent(int id)
+            {
+            var evt = await _context.FlightEvents.FindAsync(id);
+            if (evt is null)
+                return;
+
+            _context.FlightEvents.Remove(evt);
+            await _context.SaveChangesAsync();
+            }
+
+        // GET ALL EVENTS
+        public async Task<List<FlightEvent>> GetAllEvents()
+            {
+            return await _context.FlightEvents.ToListAsync();
+            }
+
+        // GET ONE EVENT
+        public async Task<FlightEvent?> GetEvent(int id)
+            {
+            return await _context.FlightEvents.FindAsync(id);
+            }
+
 
 
         }

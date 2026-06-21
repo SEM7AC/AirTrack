@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AirTrack.Server.Models.People
     {
@@ -32,5 +33,9 @@ namespace AirTrack.Server.Models.People
 
         public int? AssignedInstructorId { get; set; }
         public Instructor? AssignedInstructor { get; set; }
+
+        [NotMapped]
+        public string FullName => $"{FirstName} {LastName}";
+
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace AirTrack.Server.Models.Aircraft
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace AirTrack.Server.Models.Aircraft
     {
     public enum AircraftStatus
         {
@@ -31,6 +33,7 @@
         public int SquawkCount { get; set; }
 
         // Status & Equipment
+        [NotMapped]
         public AircraftStatus Status { get; set; }
         public OptionalEquipment Equipment { get; set; }
 
