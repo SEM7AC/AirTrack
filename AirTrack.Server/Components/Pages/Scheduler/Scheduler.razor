@@ -15,10 +15,18 @@
     <h2>Scheduler</h2>
     
     <div class="top-buttons">
+        <div>
         <button type="button" @onclick="OpenAddDrawer">Add</button>
         <button type="button" @onclick="OpenEditDrawer">Edit</button>
         <button type="button" @onclick="OpenDeleteDrawer">Delete</button>
         <span class="event-count">Total: @Events.Count</span>
+        </div>
+        <div class="day-nav">
+            <button @onclick="PrevDay">◀</button>
+            <span>@CurrentSchedulerDate.ToString("MMM dd, yyyy")</span>
+            <button @onclick="NextDay">▶</button>
+            <button @onclick="GoToday">Today</button>
+        </div>
     </div>
 
     <div class="scheduler-container">
@@ -153,7 +161,8 @@
         Instructors = await Db.GetAllInstructors();
         Students = await Db.GetAllStudents();
         Mechanics = await Db.GetAllMechanics();
-        Events = await Db.GetAllEvents();
+        await LoadEventsForDay();
+
     }
 
     void OpenAddDrawer()
@@ -219,7 +228,7 @@
         {
             SelectedAircraftId = id;
 
-            // ⭐ REQUIRED FIX — THIS WAS MISSING
+            
             CurrentEvent.AircraftId = id;
 
             FilteredEvents = Events.Where(ev => ev.AircraftId == id).ToList();
@@ -257,7 +266,7 @@
 
     async Task SaveEvent()
     {
-        // ⭐ REQUIRED FIX — DO NOT SAVE AircraftId = 0
+        // DO NOT SAVE AircraftId = 0
         if (CurrentEvent.AircraftId is null)
             return;
 
@@ -278,10 +287,10 @@
             await Db.AddEvent(entity);
 
         AircraftList = await Db.GetAllAircraft();
-        Events = await Db.GetAllEvents();
         Instructors = await Db.GetAllInstructors();
         Students = await Db.GetAllStudents();
         Mechanics = await Db.GetAllMechanics();
+        await LoadEventsForDay();
 
         CloseDrawer();
     }
@@ -291,7 +300,8 @@
         if (SelectedEventId is int id)
             await Db.DeleteEvent(id);
 
-        Events = await Db.GetAllEvents();
+            await LoadEventsForDay();
+
         CloseDrawer();
     }
 
@@ -333,4 +343,39 @@
 
         return $"{ev.Start:HH:mm}-{ev.End:HH:mm}";
     }
+
+    async Task PrevDay()
+{
+    CurrentSchedulerDate = CurrentSchedulerDate.AddDays(-1);
+    await LoadEventsForDay();
+}
+
+    async Task NextDay()
+{
+    CurrentSchedulerDate = CurrentSchedulerDate.AddDays(1);
+    await LoadEventsForDay();
+}
+
+    async Task GoToday()
+{
+    CurrentSchedulerDate = DateTime.Today;
+    await LoadEventsForDay();
+}
+    
+    async Task LoadEventsForDay()
+{
+    var all = await Db.GetAllEvents();
+
+    Events = all
+        .Where(e => e.Start.Date == CurrentSchedulerDate.Date)
+        .ToList();
+
+    // Reset selection state
+    FilteredEvents = new();
+    SelectedEventId = null;
+
+    StateHasChanged();
+}
+
+
 }
