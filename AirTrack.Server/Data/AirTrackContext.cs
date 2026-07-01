@@ -50,7 +50,7 @@ namespace AirTrack.Server.Data
 
         // Maintenance
         public DbSet<Squawk> Squawks { get; set; }
-        public DbSet<CorrectiveAction> CorrectiveActions { get; set; }
+        
         
 
 
