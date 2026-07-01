@@ -6,6 +6,13 @@
     overflow: hidden;
 }
 
+/* TOP SECTION */
+.mx-top {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 /* LEFT PANEL */
 .mx-list-panel {
     width: 350px;
@@ -18,37 +25,41 @@
     min-height: 0;
 }
 
-    /* SEARCH BOX */
-    .mx-list-panel .search-box {
-        margin-bottom: 16px;
-        background-color: #0D2238;
+.mx-title {
+    color: #A8C7E6;
+    margin-bottom: 12px;
+}
+
+/* SEARCH BOX */
+.search-box {
+    margin-bottom: 16px;
+    background-color: #0D2238;
+    border: 1px solid #1F2E45;
+    border-radius: 6px;
+    padding: 0;
+}
+
+    .search-box input {
+        width: calc(100% - 12px);
+        margin: 6px;
+        padding: 10px;
+        background-color: #0A1A2F;
         border: 1px solid #1F2E45;
         border-radius: 6px;
-        padding: 0;
+        color: #E8F1FF;
+        font-size: 0.95rem;
+        box-sizing: border-box;
     }
 
-        .mx-list-panel .search-box input {
-            width: calc(100% - 12px);
-            margin-left: 6px;
-            margin-right: 6px;
-            padding: 10px;
-            background-color: #0A1A2F;
-            border: 1px solid #1F2E45;
-            border-radius: 6px;
-            color: #E8F1FF;
-            font-size: 0.95rem;
-            box-sizing: border-box;
+        .search-box input::placeholder {
+            color: #7A8BA3;
         }
 
-            .mx-list-panel .search-box input::placeholder {
-                color: #7A8BA3;
-            }
-
-            .mx-list-panel .search-box input:focus {
-                border-color: #4CC2FF;
-                box-shadow: 0 0 6px #4CC2FF55;
-                outline: none;
-            }
+        .search-box input:focus {
+            border-color: #4CC2FF;
+            box-shadow: 0 0 6px #4CC2FF55;
+            outline: none;
+        }
 
 /* AIRCRAFT LIST */
 .mx-aircraft-list {
@@ -99,30 +110,53 @@
     min-height: 0;
 }
 
-    .mx-detail-panel h3 {
-        color: #A8C7E6;
-        margin-bottom: 12px;
-    }
-
-/* HORIZONTAL SPLIT */
+/* RIGHT PANEL TOP */
 .mx-detail-top {
-    flex: 1;
-    overflow-y: auto;
+    height: 60%;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    overflow: hidden;
     padding-right: 12px;
+    border-bottom: 4px solid #4CC2FF;
 }
 
-.mx-detail-bottom {
-    flex: 1;
-    overflow-y: auto;
-    border-top: 1px solid #2A3A4A;
-    padding-top: 12px;
+/* LEFT SIDE OF TOP PANEL */
+.mx-top-left {
+    flex: 0 0 60%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-/* SQUAWKS */
+.mx-section-title {
+    color: #A8C7E6;
+    margin-bottom: 12px;
+}
+
+.mx-subsection-title {
+    color: #A8C7E6;
+    margin-bottom: 8px;
+}
+
+.mx-ac-info {
+    color: #A8C7E6;
+    margin-bottom: 16px;
+}
+
+/* SQUAWK LIST */
 .mx-open-squawks {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-right: 6px;
+}
+
+.mx-muted {
+    color: #A8C7E6;
 }
 
 .mx-squawk-item {
@@ -137,9 +171,31 @@
         background-color: #16375A;
     }
 
+.mx-squawk-desc {
+    color: white;
+    font-weight: bold;
+}
+
+.mx-squawk-date {
+    color: #A8C7E6;
+}
+
+/* RIGHT SIDE OF TOP PANEL */
+.mx-top-right {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
 /* FORM ELEMENTS */
-.mx-detail-bottom input,
-.mx-detail-bottom textarea {
+.mx-field-label {
+    color: #A8C7E6;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.mx-input {
     width: 100%;
     padding: 8px;
     background-color: #112B45;
@@ -147,18 +203,41 @@
     border-radius: 5px;
     color: white;
     margin-bottom: 10px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
 }
 
-.mx-detail-bottom button {
+.mx-checkbox-label {
+    color: #A8C7E6;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.mx-button {
     padding: 6px 12px;
     background-color: #1E4973;
     border: none;
     border-radius: 5px;
     color: white;
     cursor: pointer;
-    margin-right: 6px;
+    margin-top: 6px;
 }
 
-    .mx-detail-bottom button:hover {
+    .mx-button:hover {
         background-color: #2A5E94;
+    }
+
+/* BOTTOM PANEL */
+.mx-detail-bottom {
+    height: 40%;
+    overflow-y: auto;
+    padding-top: 12px;
+    min-width: 0;
+}
+
+    .mx-detail-bottom .mx-input {
+        max-width: 100%;
+        box-sizing: border-box;
     }

@@ -7,15 +7,13 @@
 
 <div class="mx-container">
 
-    <!-- TOP SECTION -->
     <div class="mx-top">
 
         <!-- LEFT PANEL -->
         <div class="mx-list-panel">
 
-            <h2 style="color:#A8C7E6; margin-bottom:12px;">Maintenance</h2>
+            <h2 class="mx-title">Maintenance</h2>
 
-            <!-- SEARCH BOX -->
             <div class="search-box">
                 <input type="text"
                        placeholder="Search by tail number or model..."
@@ -36,76 +34,94 @@
 
         </div>
 
-        <!-- RIGHT PANEL (HORIZONTAL SPLIT) -->
+        <!-- RIGHT PANEL -->
         <div class="mx-detail-panel">
 
-            <!-- TOP HALF -->
             <div class="mx-detail-top">
-                @if (selectedAircraft is not null)
-                {
-                    <h3>@selectedAircraft.TailNumber</h3>
 
-                    <div style="color:#A8C7E6; margin-bottom:16px;">
-                        <div>Model: @selectedAircraft.Model</div>
-                        <div>Hobbs: @selectedAircraft.Hobbs</div>
-                        <div>Tach: @selectedAircraft.Tach</div>
-                        <div>Annual Due: @selectedAircraft.AnnualDueDate.ToShortDateString()</div>
-                        <div>Open Squawks: @selectedAircraft.SquawkCount</div>
-                    </div>
+                <!-- LEFT SIDE: AC INFO + SQUAWKS -->
+                <div class="mx-top-left">
+                    @if (selectedAircraft is not null)
+                    {
+                        <h3 class="mx-section-title">@selectedAircraft.TailNumber</h3>
 
-                    <h4 style="color:#A8C7E6; margin-bottom:8px;">Open Squawks</h4>
+                        <div class="mx-ac-info">
+                            <div>Model: @selectedAircraft.Model</div>
+                            <div>Hobbs: @selectedAircraft.Hobbs</div>
+                            <div>Tach: @selectedAircraft.Tach</div>
+                            <div>Annual Due: @selectedAircraft.AnnualDueDate.ToShortDateString()</div>
+                            <div>Open Squawks: @selectedAircraft.SquawkCount</div>
+                        </div>
 
-                    <div class="mx-open-squawks">
-                        @if (openSquawks is null)
-                        {
-                            <div style="color:#A8C7E6;">Select an aircraft.</div>
-                        }
-                        else if (openSquawks.Count == 0)
-                        {
-                            <div style="color:#A8C7E6;">No open squawks.</div>
-                        }
-                        else
-                        {
-                            foreach (var s in openSquawks)
+                        <h4 class="mx-subsection-title">Open Squawks</h4>
+
+                        <div class="mx-open-squawks">
+                            @if (openSquawks is null)
                             {
-                                <div class="mx-squawk-item"
-                                     @onclick="() => SelectSquawk(s)">
-                                    <strong style="color:white;">@s.Description</strong>
-                                    <div style="color:#A8C7E6;">
-                                        Reported: @s.ReportedAt.ToShortDateString()
-                                    </div>
-                                </div>
+                                <div class="mx-muted">Select an aircraft.</div>
                             }
-                        }
-                    </div>
-                }
+                            else if (openSquawks.Count == 0)
+                            {
+                                <div class="mx-muted">No open squawks.</div>
+                            }
+                            else
+                            {
+                                foreach (var s in openSquawks)
+                                {
+                                    <div class="mx-squawk-item"
+                                         @onclick="() => SelectSquawk(s)">
+                                        <strong class="mx-squawk-desc">@s.Description</strong>
+                                        <div class="mx-squawk-date">
+                                            Reported: @s.ReportedAt.ToShortDateString()
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- RIGHT SIDE: ADD SQUAWK -->
+                <div class="mx-top-right">
+                    @if (selectedAircraft is not null)
+                    {
+                        <h3 class="mx-section-title">Add Squawk</h3>
+
+                        <label class="mx-field-label">Description</label>
+                        <input type="text"
+                               class="mx-input"
+                               placeholder="Squawk description"
+                               @bind="newSquawkText" />
+
+                        <label class="mx-checkbox-label">
+                            <input type="checkbox" @bind="newSquawkIsGrounding" />
+                            Grounding?
+                        </label>
+
+                        <button class="mx-button" @onclick="AddSquawk">Add Squawk</button>
+                    }
+                </div>
+
             </div>
 
-            <!-- BOTTOM HALF -->
+            <!-- BOTTOM: RESOLVE -->
             <div class="mx-detail-bottom">
-                @if (selectedAircraft is not null)
+                @if (selectedAircraft is not null && selectedSquawk is not null)
                 {
-                    <h3 style="color:#A8C7E6;">Add Squawk</h3>
+                    <h3 class="mx-section-title">Resolve Squawk</h3>
 
+                    <label class="mx-field-label">Resolution Notes</label>
+                    <textarea class="mx-input"
+                              placeholder="Resolution notes"
+                              @bind="resolutionNotes"></textarea>
+
+                    <label class="mx-field-label">Mechanic Signoff</label>
                     <input type="text"
-                           placeholder="Squawk description"
-                           @bind="newSquawkText" />
+                           class="mx-input"
+                           placeholder="Mechanic signoff"
+                           @bind="mechanicSignoff" />
 
-                    <button @onclick="AddSquawk">Add Squawk</button>
-
-                    @if (selectedSquawk is not null)
-                    {
-                        <h3 style="color:#A8C7E6; margin-top:20px;">Resolve Squawk</h3>
-
-                        <textarea placeholder="Resolution notes"
-                                  @bind="resolutionNotes"></textarea>
-
-                        <input type="text"
-                               placeholder="Mechanic signoff"
-                               @bind="mechanicSignoff" />
-
-                        <button @onclick="ResolveSquawk">Resolve</button>
-                    }
+                    <button class="mx-button" @onclick="ResolveSquawk">Resolve</button>
                 }
             </div>
 
@@ -123,6 +139,8 @@
     private Squawk? selectedSquawk;
 
     private string newSquawkText = string.Empty;
+    private bool newSquawkIsGrounding = false;
+
     private string resolutionNotes = string.Empty;
     private string mechanicSignoff = string.Empty;
 
@@ -161,25 +179,28 @@
 
     private async Task AddSquawk()
     {
-        if (string.IsNullOrWhiteSpace(newSquawkText))
+        if (string.IsNullOrWhiteSpace(newSquawkText) || selectedAircraft is null)
             return;
 
         var squawk = new Squawk
         {
-            AircraftId = selectedAircraft!.Id,
+            AircraftId = selectedAircraft.Id,
             Description = newSquawkText,
+            IsGrounding = newSquawkIsGrounding,
             ReportedAt = DateTime.UtcNow
         };
 
         await Db.AddSquawk(squawk);
 
         newSquawkText = string.Empty;
-        openSquawks = await Db.GetOpenSquawks(selectedAircraft!.Id);
+        newSquawkIsGrounding = false;
+
+        openSquawks = await Db.GetOpenSquawks(selectedAircraft.Id);
     }
 
     private async Task ResolveSquawk()
     {
-        if (selectedSquawk is null)
+        if (selectedSquawk is null || selectedAircraft is null)
             return;
 
         await Db.ResolveSquawk(
@@ -190,7 +211,7 @@
         resolutionNotes = string.Empty;
         mechanicSignoff = string.Empty;
 
-        openSquawks = await Db.GetOpenSquawks(selectedAircraft!.Id);
+        openSquawks = await Db.GetOpenSquawks(selectedAircraft.Id);
         selectedSquawk = null;
     }
 }
