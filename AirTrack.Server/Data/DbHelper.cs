@@ -1,5 +1,6 @@
 ﻿using AirTrack.Server.Data;
 using AirTrack.Server.Models.Aircraft;
+using AirTrack.Server.Models.Maintenance;
 using AirTrack.Server.Models.People;
 using AirTrack.Server.Models.Scheduler;
 using Microsoft.EntityFrameworkCore;
@@ -223,6 +224,41 @@ namespace AirTrack.Server.Data
             return await _context.FlightEvents.FindAsync(id);
             }
 
+        // GET OPEN SQUAWKS FOR AIRCRAFT
+        public async Task<List<Squawk>> GetOpenSquawks(int aircraftId)
+            {
+            return await _context.Squawks
+                .Where(s => s.AircraftId == aircraftId && s.ResolvedAt == null)
+                .OrderByDescending(s => s.ReportedAt)
+                .ToListAsync();
+            }
+
+        // ADD SQUAWK
+        public async Task AddSquawk(Squawk squawk)
+            {
+            _context.Squawks.Add(squawk);
+            await _context.SaveChangesAsync();
+            }
+
+        // RESOLVE SQUAWK
+        public async Task ResolveSquawk(int squawkId, string resolutionNotes, string mechanicSignoff)
+            {
+            var squawk = await _context.Squawks.FindAsync(squawkId);
+            if (squawk is null)
+                return;
+
+            squawk.ResolutionNotes = resolutionNotes;
+            squawk.MechanicSignoff = mechanicSignoff;
+            squawk.ResolvedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            }
+
+        // GET ONE SQUAWK
+        public async Task<Squawk?> GetSquawk(int id)
+            {
+            return await _context.Squawks.FindAsync(id);
+            }
 
 
         }
