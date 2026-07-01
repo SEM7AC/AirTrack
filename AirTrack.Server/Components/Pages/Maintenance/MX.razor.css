@@ -1,0 +1,164 @@
+﻿/* MAIN LAYOUT */
+.mx-container {
+    display: flex;
+    height: 100vh;
+    background-color: #0A1929;
+    overflow: hidden;
+}
+
+/* LEFT PANEL */
+.mx-list-panel {
+    width: 350px;
+    background-color: #0D2238;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 2px solid #112B45;
+    flex: 0 0 auto;
+    min-height: 0;
+}
+
+    /* SEARCH BOX */
+    .mx-list-panel .search-box {
+        margin-bottom: 16px;
+        background-color: #0D2238;
+        border: 1px solid #1F2E45;
+        border-radius: 6px;
+        padding: 0;
+    }
+
+        .mx-list-panel .search-box input {
+            width: calc(100% - 12px);
+            margin-left: 6px;
+            margin-right: 6px;
+            padding: 10px;
+            background-color: #0A1A2F;
+            border: 1px solid #1F2E45;
+            border-radius: 6px;
+            color: #E8F1FF;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+            .mx-list-panel .search-box input::placeholder {
+                color: #7A8BA3;
+            }
+
+            .mx-list-panel .search-box input:focus {
+                border-color: #4CC2FF;
+                box-shadow: 0 0 6px #4CC2FF55;
+                outline: none;
+            }
+
+/* AIRCRAFT LIST */
+.mx-aircraft-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.mx-aircraft-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: #112B45;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .mx-aircraft-item:hover {
+        background-color: #16375A;
+    }
+
+    .mx-aircraft-item.selected {
+        background-color: #1E4973;
+    }
+
+    .mx-aircraft-item .name {
+        font-weight: bold;
+        color: white;
+    }
+
+    .mx-aircraft-item .sub {
+        font-size: 0.9rem;
+        color: #A8C7E6;
+    }
+
+/* RIGHT PANEL */
+.mx-detail-panel {
+    flex: 1 1 auto;
+    padding: 20px;
+    background-color: #0D2238;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+    .mx-detail-panel h3 {
+        color: #A8C7E6;
+        margin-bottom: 12px;
+    }
+
+/* HORIZONTAL SPLIT */
+.mx-detail-top {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 12px;
+}
+
+.mx-detail-bottom {
+    flex: 1;
+    overflow-y: auto;
+    border-top: 1px solid #2A3A4A;
+    padding-top: 12px;
+}
+
+/* SQUAWKS */
+.mx-open-squawks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mx-squawk-item {
+    background-color: #112B45;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .mx-squawk-item:hover {
+        background-color: #16375A;
+    }
+
+/* FORM ELEMENTS */
+.mx-detail-bottom input,
+.mx-detail-bottom textarea {
+    width: 100%;
+    padding: 8px;
+    background-color: #112B45;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.mx-detail-bottom button {
+    padding: 6px 12px;
+    background-color: #1E4973;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    margin-right: 6px;
+}
+
+    .mx-detail-bottom button:hover {
+        background-color: #2A5E94;
+    }

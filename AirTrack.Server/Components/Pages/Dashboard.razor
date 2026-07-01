@@ -35,7 +35,7 @@ else
     private List<AircraftBase> AircraftList = new();
     private List<FlightEvent> Events = new();
 
-    private System.Timers.Timer _timer;
+    private System.Timers.Timer? _timer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,8 +43,8 @@ else
     }
 
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-{
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
     if (firstRender)
     {
         _timer = new System.Timers.Timer(15000);
@@ -57,6 +57,7 @@ else
         _timer.AutoReset = true;
         _timer.Start();
     }
+    return Task.CompletedTask;
 }
 
     private async Task LoadData()
