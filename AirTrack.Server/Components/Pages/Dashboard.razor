@@ -24,16 +24,49 @@ else
         <div class="aircraft-grid">
             @foreach (var plane in AircraftList)
             {
-                <AircraftCard @key="plane.Id" Aircraft="plane" />
+                <AircraftCard @key="plane.Id" Aircraft="plane" OnUpdateHobbs="OpenHobbsModal"/>
 
             }
         </div>
     </div>
 }
 
+@if (HobbsModalVisible && SelectedAircraft is not null)
+{
+    <div class="modal-backdrop">
+        <div class="modal">
+            <h3>Update Hobbs</h3>
+
+            <div class="modal-row">
+                <label>Old Hobbs</label>
+                <input type="number" value="@SelectedAircraft.Hobbs" readonly />
+            </div>
+
+            <div class="modal-row">
+                <label>New Hobbs</label>
+                <input type="number" @bind="NewHobbs" step="0.1" />
+            </div>
+
+            @if (!IsHobbsValid)
+            {
+                <div class="error">New Hobbs must be greater than old Hobbs.</div>
+            }
+
+            <div class="modal-actions">
+                <button @onclick="SaveHobbs" disabled="@(NewHobbs is null || !IsHobbsValid)">Save</button>
+                <button @onclick="() => HobbsModalVisible = false">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
 @code {
     private List<AircraftBase> AircraftList = new();
     private List<FlightEvent> Events = new();
+
+    private bool HobbsModalVisible;
+    private AircraftBase? SelectedAircraft;
+    private decimal? NewHobbs;
+
 
     private System.Timers.Timer? _timer;
 
@@ -146,6 +179,30 @@ else
     // 3. Available
     return AircraftStatus.Available;
 }
+
+    void OpenHobbsModal(AircraftBase aircraft)
+    {
+        SelectedAircraft = aircraft;
+        NewHobbs = null;
+        HobbsModalVisible = true;
+    }
+
+    private bool IsHobbsValid =>
+    NewHobbs is not null &&
+    SelectedAircraft is not null &&
+    NewHobbs > SelectedAircraft.Hobbs;
+
+    async Task SaveHobbs()
+    {
+        if (!IsHobbsValid || SelectedAircraft is null)
+            return;
+
+        
+        SelectedAircraft.Hobbs = NewHobbs.Value;
+        await Db.UpdateAircraft(SelectedAircraft);
+
+        HobbsModalVisible = false;
+    }
 
 }
 

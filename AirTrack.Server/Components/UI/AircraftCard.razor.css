@@ -1,6 +1,6 @@
 ﻿.aircraft-card {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr; /* adjust ratios as needed */
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto; /* adjust ratios as needed */
     align-items: center;
     background-color: #0A1A2F;
     color: white;
@@ -43,3 +43,19 @@
     color: #9E9E9E; /* gray */
     font-weight: 600;
 }
+
+.hobbs-button button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    background: #1E4973; /* deep aviation blue */
+    border: 1px solid #2A5E94;
+    border-radius: 4px;
+    color: #A8C7E6; /* soft cockpit text */
+    cursor: pointer;
+    height: 36px;
+    white-space: nowrap;
+}
+
+    .hobbs-button button:hover {
+        background: #2A5E94;
+    }

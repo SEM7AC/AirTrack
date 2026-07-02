@@ -31,6 +31,11 @@
     <div class="aircraft-squawks">
         Squawks: @Aircraft.SquawkCount
     </div>
+
+    <div class="hobbs-button">
+        <button @onclick="() => OnUpdateHobbs.InvokeAsync(Aircraft)">Update Hobbs</button>
+    </div>
+
 </div>
 
 
@@ -39,6 +44,8 @@
 @code {
     [Parameter]
     public AircraftBase Aircraft { get; set; } = null!;
+    [Parameter] 
+    public EventCallback<AircraftBase> OnUpdateHobbs { get; set; }
 
     private string GetStatusClass(string status) =>
         status.ToLower() switch
