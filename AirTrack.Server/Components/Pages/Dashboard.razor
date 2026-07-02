@@ -109,24 +109,43 @@ else
     }
 
     private AircraftStatus GetStatus(AircraftBase a)
+{
+    var now = DateTime.Now;
+
+    var aircraftEvents = Events
+        .Where(e => e.AircraftId == a.Id)
+        .OrderBy(e => e.Start)
+        .ToList();
+
+    // 1. InFlight?
+    var active = aircraftEvents
+        .FirstOrDefault(e => e.Start <= now && e.End >= now);
+
+    if (active != null)
     {
-        var now = DateTime.Now;
+        a.CurrentFlightStart = active.Start;
 
-        var evt = Events
-            .Where(e => e.AircraftId == a.Id)
-            .OrderBy(e => e.Start)
-            .FirstOrDefault();
+        var next = aircraftEvents.FirstOrDefault(e => e.Start > now);
+        a.NextBookingStart = next?.Start;
+        a.NextBookingEnd = next?.End;
 
-        if (evt is null)
-            return AircraftStatus.Available;
-
-        if (now < evt.Start)
-            return AircraftStatus.Scheduled;
-
-        if (now >= evt.Start && now <= evt.End)
-            return AircraftStatus.InFlight;
-
-        return AircraftStatus.Available;
+        return AircraftStatus.InFlight;
     }
+
+    // 2. Scheduled?
+    var future = aircraftEvents.FirstOrDefault(e => e.Start > now);
+
+    if (future != null)
+    {
+        a.NextBookingStart = future.Start;
+        a.NextBookingEnd = future.End;
+
+        return AircraftStatus.Scheduled;
+    }
+
+    // 3. Available
+    return AircraftStatus.Available;
+}
+
 }
 

@@ -7,9 +7,18 @@
 
     </div>
 
+    @if (Aircraft.NextBookingStart is not null && Aircraft.NextBookingEnd is not null)
+{
     <div class="aircraft-next">
-        Next: @(Aircraft.NextBookingStart?.ToString("HH:mm") ?? "—")
+        Next: @(Aircraft.NextBookingStart.Value.ToString("HHmm"))-@(Aircraft.NextBookingEnd.Value.ToString("HHmm"))
     </div>
+}
+    else
+    {
+        <div class="aircraft-next">
+            Next: —
+        </div>
+    }
 
     <div class="aircraft-status @GetStatusClass(Aircraft.Status.ToString())">
         Status: @Aircraft.Status

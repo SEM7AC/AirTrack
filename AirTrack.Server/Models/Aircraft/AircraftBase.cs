@@ -39,12 +39,17 @@ namespace AirTrack.Server.Models.Aircraft
         public OptionalEquipment Equipment { get; set; }
 
         // Current Flight (runtime)
+        [NotMapped]
         public string CurrentStudent { get; set; } = string.Empty;
+        [NotMapped]
         public string CurrentInstructor { get; set; } = string.Empty;
+        [NotMapped]
         public DateTime? CurrentFlightStart { get; set; }
 
         // Scheduling (runtime)
+        [NotMapped]
         public DateTime? NextBookingStart { get; set; }
+        [NotMapped]
         public DateTime? NextBookingEnd { get; set; }
 
         
