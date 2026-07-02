@@ -69,12 +69,15 @@ else
 
             foreach (var plane in AircraftList)
             {
+                plane.SquawkCount = await Db.GetOpenSquawksCount(plane.Id); //check before grounding condition
+
                 if (await Db.AircraftHasGroundingSquawk(plane.Id))
                 {
                     plane.Status = AircraftStatus.Maintenance;
                     continue;
                 }
-                plane.Status = GetStatus(plane);
+                
+                plane.Status = GetStatus(plane); //If not MX then Get Status
             }
         }
         catch (Exception ex)

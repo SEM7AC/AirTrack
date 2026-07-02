@@ -233,6 +233,14 @@ namespace AirTrack.Server.Data
                 .ToListAsync();
             }
 
+        // COUNT OPEN SQUAWKS
+        public async Task<int> GetOpenSquawksCount(int aircraftId)
+            {
+            return await _context.Squawks
+                .CountAsync(s => s.AircraftId == aircraftId && s.ResolvedAt == null);
+            }
+
+
         // ADD SQUAWK
         public async Task AddSquawk(Squawk squawk)
             {
