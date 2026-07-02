@@ -35,6 +35,7 @@ namespace AirTrack.Server.Models.Aircraft
         // Status & Equipment
         [NotMapped]
         public AircraftStatus Status { get; set; }
+
         public OptionalEquipment Equipment { get; set; }
 
         // Current Flight (runtime)
@@ -45,5 +46,8 @@ namespace AirTrack.Server.Models.Aircraft
         // Scheduling (runtime)
         public DateTime? NextBookingStart { get; set; }
         public DateTime? NextBookingEnd { get; set; }
+
+        
+        
         }
     }

@@ -68,7 +68,14 @@ else
             Events = await Db.GetAllEvents();
 
             foreach (var plane in AircraftList)
+            {
+                if (await Db.AircraftHasGroundingSquawk(plane.Id))
+                {
+                    plane.Status = AircraftStatus.Maintenance;
+                    continue;
+                }
                 plane.Status = GetStatus(plane);
+            }
         }
         catch (Exception ex)
         {

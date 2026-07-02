@@ -260,6 +260,15 @@ namespace AirTrack.Server.Data
             return await _context.Squawks.FindAsync(id);
             }
 
+        public async Task<bool> AircraftHasGroundingSquawk(int aircraftId)
+            {
+            return await _context.Squawks
+                .AnyAsync(s => s.AircraftId == aircraftId &&
+                               s.IsGrounding &&
+                               s.ResolvedAt == null);
+            }
+
+
 
         }
     }
