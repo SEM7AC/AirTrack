@@ -1,5 +1,32 @@
-﻿<h3>PiperArrowMaintenanceEditor</h3>
+﻿@using AirTrack.Server.Models.Aircraft
 
 @code {
-
+    [Parameter] public PiperArrow? Aircraft { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
 }
+
+<div class="mx-editor">
+    <h4>Edit Piper Arrow Maintenance</h4>
+
+    <div class="mx-field">
+        <label>Last Oil Change (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.LastOilChange" />
+    </div>
+
+    <div class="mx-field">
+        <label>Last 100 Hr Insp (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.Last100Hr" />
+    </div>
+
+    <div class="mx-field">
+        <label>Last Gear Cycles Insp</label>
+        <InputNumber @bind-Value="Aircraft!.LastGearCyclesInspection" />
+    </div>
+
+    <div class="mx-field">
+        <label>Prop Overhaul Due</label>
+        <InputDate @bind-Value="Aircraft!.PropOverhaulDue" />
+    </div>
+
+    <button class="mx-save" @onclick="OnSave">Save</button>
+</div>

@@ -1,5 +1,32 @@
-﻿<h3>RobinsonR44MaintenanceEditor</h3>
+﻿@using AirTrack.Server.Models.Aircraft
 
 @code {
-
+    [Parameter] public RobinsonR44? Aircraft { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
 }
+
+<div class="mx-editor">
+    <h4>Edit Robinson R44 Maintenance</h4>
+
+    <div class="mx-field">
+        <label>Last 2200 Hr Overhaul (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.Last2200HrOverhaul" />
+    </div>
+
+    <div class="mx-field">
+        <label>Blade Life Remaining (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.BladeLifeRemaining" />
+    </div>
+
+    <div class="mx-field">
+        <label>Clutch Actuation Count</label>
+        <InputNumber @bind-Value="Aircraft!.ClutchActuationCount" />
+    </div>
+
+    <div class="mx-field">
+        <label>Governor Inspection Due</label>
+        <InputDate @bind-Value="Aircraft!.GovernorInspectionDue" />
+    </div>
+
+    <button class="mx-save" @onclick="OnSave">Save</button>
+</div>

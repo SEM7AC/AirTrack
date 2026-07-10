@@ -1,5 +1,42 @@
-﻿<h3>CessnaSkyhawkMaintenanceEditor</h3>
+﻿@using AirTrack.Server.Models.Aircraft
 
 @code {
-
+    [Parameter] public CessnaSkyhawk? Aircraft { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
 }
+
+<div class="mx-editor">
+    <h4>Edit Cessna Skyhawk Maintenance</h4>
+
+    <div class="mx-field">
+        <label>Last Oil Change (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.LastOilChange" />
+    </div>
+
+    <div class="mx-field">
+        <label>Last 50 Hr Insp (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.Last50Hr" />
+    </div>
+
+    <div class="mx-field">
+        <label>Last 100 Hr Insp (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.Last100Hr" />
+    </div>
+
+    <div class="mx-field">
+        <label>ELT Inspection Due</label>
+        <InputDate @bind-Value="Aircraft!.ELTInspectionDue" />
+    </div>
+
+    <div class="mx-field">
+        <label>Transponder Due</label>
+        <InputDate @bind-Value="Aircraft!.TransponderDue" />
+    </div>
+
+    <div class="mx-field">
+        <label>Pitot/Static Due</label>
+        <InputDate @bind-Value="Aircraft!.PitotStaticDue" />
+    </div>
+
+    <button class="mx-save" @onclick="OnSave">Save</button>
+</div>

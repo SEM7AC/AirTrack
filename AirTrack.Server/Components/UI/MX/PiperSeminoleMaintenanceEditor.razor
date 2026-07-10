@@ -1,5 +1,42 @@
-﻿<h3>PiperSeminoleMaintenanceEditor</h3>
+﻿@using AirTrack.Server.Models.Aircraft
 
 @code {
-
+    [Parameter] public PiperSeminole? Aircraft { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
 }
+
+<div class="mx-editor">
+    <h4>Edit Piper Seminole Maintenance</h4>
+
+    <div class="mx-field">
+        <label>Left Engine Hobbs (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.LastLeftEngineHobbs" />
+    </div>
+
+    <div class="mx-field">
+        <label>Right Engine Hobbs (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.LastRightEngineHobbs" />
+    </div>
+
+    <div class="mx-field">
+        <label>Last 100 Hr Insp (hrs)</label>
+        <InputNumber @bind-Value="Aircraft!.Last100Hr" />
+    </div>
+
+    <div class="mx-field">
+        <label>Left Prop Overhaul Due</label>
+        <InputDate @bind-Value="Aircraft!.LeftPropOverhaulDue" />
+    </div>
+
+    <div class="mx-field">
+        <label>Right Prop Overhaul Due</label>
+        <InputDate @bind-Value="Aircraft!.RightPropOverhaulDue" />
+    </div>
+
+    <div class="mx-field">
+        <label>Last Gear Cycles Insp</label>
+        <InputNumber @bind-Value="Aircraft!.LastGearCyclesInspection" />
+    </div>
+
+    <button class="mx-save" @onclick="OnSave">Save</button>
+</div>

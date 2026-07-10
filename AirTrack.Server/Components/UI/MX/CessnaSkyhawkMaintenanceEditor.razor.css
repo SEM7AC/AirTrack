@@ -1,0 +1,49 @@
+﻿.mx-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    background: #1e1e1e;
+    border-radius: 8px;
+    border: 1px solid #333;
+    color: #eaeaea;
+}
+
+.mx-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+    .mx-field label {
+        font-size: 0.9rem;
+        color: #cfcfcf;
+    }
+
+    .mx-field input {
+        padding: 6px 10px;
+        background: #2a2a2a;
+        border: 1px solid #444;
+        border-radius: 4px;
+        color: #eaeaea;
+    }
+
+        .mx-field input:focus {
+            outline: none;
+            border-color: #6aa0ff;
+        }
+
+.mx-save {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #3a6df0;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .mx-save:hover {
+        background: #2f56c4;
+    }

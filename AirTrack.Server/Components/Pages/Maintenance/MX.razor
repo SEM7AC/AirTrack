@@ -163,19 +163,19 @@
 
             @if (selectedAircraft is CessnaSkyhawk skyhawk)
             {
-                <CessnaSkyhawkMaintenanceEditor Aircraft="skyhawk" />
+                <CessnaSkyhawkMaintenanceEditor Aircraft="skyhawk" OnSave="SaveMxInfo"/>
             }
             else if (selectedAircraft is PiperArrow arrow)
             {
-                <PiperArrowMaintenanceEditor Aircraft="arrow" />
+                <PiperArrowMaintenanceEditor Aircraft="arrow" OnSave="SaveMxInfo"/>
             }
             else if (selectedAircraft is PiperSeminole seminole)
             {
-                <PiperSeminoleMaintenanceEditor Aircraft="seminole" />
+                <PiperSeminoleMaintenanceEditor Aircraft="seminole" OnSave="SaveMxInfo"/>
             }
             else if (selectedAircraft is RobinsonR44 r44)
             {
-                <RobinsonR44MaintenanceEditor Aircraft="r44" />
+                <RobinsonR44MaintenanceEditor Aircraft="r44" OnSave="SaveMxInfo"/>
             }
 
             <button class="mx-button" @onclick="() => showMxEditor = false">
@@ -279,4 +279,18 @@
 
         showMxEditor = true;
     }
+
+    private async Task SaveMxInfo()
+{
+    if (selectedAircraft is null)
+        return;
+
+    await Db.UpdateAircraft(selectedAircraft);
+
+    aircraft = await Db.GetAllAircraft();
+    openSquawks = await Db.GetOpenSquawks(selectedAircraft.Id);
+
+    showMxEditor = false;
+}
+
 }
