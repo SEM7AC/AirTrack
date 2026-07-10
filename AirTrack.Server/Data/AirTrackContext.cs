@@ -27,11 +27,7 @@ namespace AirTrack.Server.Data
             .HasIndex(a => a.TailNumber)
             .IsUnique();
 
-            modelBuilder.Entity<AircraftBase>()
-                        .HasMany<RecurringAD>()
-                        .WithOne(ad => ad.Aircraft)
-                        .HasForeignKey(ad => ad.AircraftId)
-                        .OnDelete(DeleteBehavior.Cascade);
+            
 
 
             base.OnModelCreating(modelBuilder);

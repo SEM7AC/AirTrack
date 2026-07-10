@@ -7,6 +7,6 @@ public class RobinsonR44 : AircraftBase
     public int ClutchActuationCount { get; set; }
     public DateTime? GovernorInspectionDue { get; set; }
 
-    public List<RecurringAD> RecurringADs { get; set; } = new();
+    
     
 }

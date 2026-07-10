@@ -10,6 +10,6 @@
         public DateTime? RightPropOverhaulDue { get; set; }
         public int LastGearCyclesInspection { get; set; }
 
-        public List<RecurringAD> RecurringADs { get; set; } = new();
+        
         }
     }

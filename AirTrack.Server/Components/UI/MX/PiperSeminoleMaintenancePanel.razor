@@ -15,21 +15,5 @@
 
     <div>Gear Cycles Since Insp: @Aircraft?.LastGearCyclesInspection</div>
 
-    <h5>Recurring ADs</h5>
-    @if (Aircraft?.RecurringADs is not null && Aircraft.RecurringADs.Count > 0)
-    {
-        <ul>
-            @foreach (var ad in Aircraft.RecurringADs)
-            {
-                <li>
-                    <strong>@ad.ADNumber</strong> — @ad.Description  
-                    (Last: @ad.LastCompliedWith?.ToShortDateString() ?? "N/A")
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <div class="mx-muted">No recurring ADs.</div>
-    }
+    
 </div>

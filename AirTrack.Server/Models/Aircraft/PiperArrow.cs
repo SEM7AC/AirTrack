@@ -7,7 +7,7 @@
         public int LastGearCyclesInspection {  get; set; }
         public DateTime? PropOverhaulDue {  get; set; }
 
-        public List<RecurringAD> RecurringADs { get; set; } = new();
+       
 
         }
     }
