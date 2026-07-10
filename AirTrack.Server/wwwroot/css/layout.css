@@ -1,4 +1,12 @@
-﻿:root {
+﻿html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+
+:root {
     --bg-main: #0f1a2b;
     --bg-header: #142238;
     --bg-sidebar: #16263f;

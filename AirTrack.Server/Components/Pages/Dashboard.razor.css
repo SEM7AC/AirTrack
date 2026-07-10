@@ -45,3 +45,9 @@
     font-size: 0.85rem;
     margin-bottom: 0.5rem;
 }
+
+.aircraft-list {
+    overflow-y: auto;
+    max-height: 100%;
+}
+
