@@ -198,7 +198,7 @@ else
             return;
 
         
-        SelectedAircraft.Hobbs = NewHobbs.Value;
+        SelectedAircraft.Hobbs = NewHobbs!.Value;
         await Db.UpdateAircraft(SelectedAircraft);
 
         HobbsModalVisible = false;

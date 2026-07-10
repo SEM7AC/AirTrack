@@ -241,3 +241,49 @@
         max-width: 100%;
         box-sizing: border-box;
     }
+/* MAINTENANCE PANELS (DERIVED AIRCRAFT INFO) */
+.mx-maint-panel {
+    background-color: #112B45;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    color: #A8C7E6;
+    box-shadow: 0 0 6px #00000055;
+}
+
+    .mx-maint-panel h4 {
+        color: #A8C7E6;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+        font-weight: 600;
+    }
+
+    .mx-maint-panel div {
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+    }
+
+    .mx-maint-panel ul {
+        margin: 8px 0 0 16px;
+        padding: 0;
+    }
+
+    .mx-maint-panel li {
+        margin-bottom: 4px;
+        color: #A8C7E6;
+    }
+
+/* Make left side scroll cleanly with new content */
+.mx-top-left {
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Slight spacing improvement between sections */
+.mx-ac-info {
+    margin-bottom: 20px;
+}
+
+.mx-subsection-title {
+    margin-top: 20px;
+}

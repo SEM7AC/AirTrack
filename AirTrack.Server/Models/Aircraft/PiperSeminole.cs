@@ -2,11 +2,13 @@
     {
     public class PiperSeminole : AircraftBase
         {
-        public decimal LeftEngineHours { get; set; }
-        public decimal RightEngineHours { get; set; }
+        public decimal LastLeftEngineHobbs { get; set; }
+        public decimal LastRightEngineHobbs { get; set; }
+
+        public decimal Last100Hr {  get; set; }
         public DateTime? LeftPropOverhaulDue { get; set; }
         public DateTime? RightPropOverhaulDue { get; set; }
-        public int GearCyclesSinceInspection { get; set; }
+        public int LastGearCyclesInspection { get; set; }
 
         public List<RecurringAD> RecurringADs { get; set; } = new();
         }

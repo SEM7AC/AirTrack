@@ -6,10 +6,10 @@
         {
        
 
-        public decimal HoursSinceLastOilChange { get; set; }
-        public decimal HoursSinceLast50Hr { get; set; }
+        public decimal LastOilChange { get; set; }
+        public decimal Last50Hr { get; set; }
 
-        public decimal HoursSinceLast100Hr { get; set; }
+        public decimal Last100Hr { get; set; }
                
         public DateTime? ELTInspectionDue {  get; set; }
 

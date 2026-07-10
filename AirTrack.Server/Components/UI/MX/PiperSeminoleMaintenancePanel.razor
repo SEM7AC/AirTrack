@@ -1,0 +1,35 @@
+﻿@using AirTrack.Server.Models.Aircraft
+
+@code {
+    [Parameter] public PiperSeminole? Aircraft { get; set; }
+}
+
+<div class="mx-maint-panel">
+    <h4>Piper Seminole Maintenance</h4>
+
+    <div>Left Engine Hours: @Aircraft?.LastLeftEngineHobbs</div>
+    <div>Right Engine Hours: @Aircraft?.LastRightEngineHobbs</div>
+
+    <div>Left Prop Overhaul Due: @(Aircraft?.LeftPropOverhaulDue?.ToShortDateString() ?? "N/A")</div>
+    <div>Right Prop Overhaul Due: @(Aircraft?.RightPropOverhaulDue?.ToShortDateString() ?? "N/A")</div>
+
+    <div>Gear Cycles Since Insp: @Aircraft?.LastGearCyclesInspection</div>
+
+    <h5>Recurring ADs</h5>
+    @if (Aircraft?.RecurringADs is not null && Aircraft.RecurringADs.Count > 0)
+    {
+        <ul>
+            @foreach (var ad in Aircraft.RecurringADs)
+            {
+                <li>
+                    <strong>@ad.ADNumber</strong> — @ad.Description  
+                    (Last: @ad.LastCompliedWith?.ToShortDateString() ?? "N/A")
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="mx-muted">No recurring ADs.</div>
+    }
+</div>

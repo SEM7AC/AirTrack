@@ -1,0 +1,33 @@
+﻿@using AirTrack.Server.Models.Aircraft
+
+@code {
+    [Parameter] public RobinsonR44? Aircraft { get; set; }
+}
+
+<div class="mx-maint-panel">
+    <h4>Robinson R44 Maintenance</h4>
+
+    <div>Hours Since 2200 Hr Overhaul: @Aircraft?.Last2200HrOverhaul</div>
+    <div>Blade Life Remaining (hrs): @Aircraft?.BladeLifeRemaining</div>
+    <div>Clutch Actuation Count: @Aircraft?.ClutchActuationCount</div>
+
+    <div>Governor Inspection Due: @(Aircraft?.GovernorInspectionDue?.ToShortDateString() ?? "N/A")</div>
+
+    <h5>Recurring ADs</h5>
+    @if (Aircraft?.RecurringADs is not null && Aircraft.RecurringADs.Count > 0)
+    {
+        <ul>
+            @foreach (var ad in Aircraft.RecurringADs)
+            {
+                <li>
+                    <strong>@ad.ADNumber</strong> — @ad.Description  
+                    (Last: @ad.LastCompliedWith?.ToShortDateString() ?? "N/A")
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="mx-muted">No recurring ADs.</div>
+    }
+</div>

@@ -1,0 +1,17 @@
+﻿@using AirTrack.Server.Models.Aircraft
+
+@code {
+    [Parameter] public CessnaSkyhawk? Aircraft { get; set; }
+}
+
+<div class="mx-maint-panel">
+    <h4>Maintenance Status</h4>
+
+    <div>Oil Change (hrs): @Aircraft?.LastOilChange</div>
+    <div>50 Hr Insp (hrs): @Aircraft?.Last50Hr</div>
+    <div>100 Hr Insp (hrs): @Aircraft?.Last100Hr</div>
+
+    <div>ELT Due: @(Aircraft?.ELTInspectionDue?.ToShortDateString() ?? "N/A")</div>
+    <div>Transponder Due: @(Aircraft?.TransponderDue?.ToShortDateString() ?? "N/A")</div>
+    <div>Pitot/Static Due: @(Aircraft?.PitotStaticDue?.ToShortDateString() ?? "N/A")</div>
+</div>

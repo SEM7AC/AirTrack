@@ -2,6 +2,7 @@
 @using AirTrack.Server.Data
 @using AirTrack.Server.Models.Aircraft
 @using AirTrack.Server.Models.Maintenance
+@using AirTrack.Server.Components.UI.MX
 @rendermode InteractiveServer
 @inject DbHelper Db
 
@@ -39,7 +40,7 @@
 
             <div class="mx-detail-top">
 
-                <!-- LEFT SIDE: AC INFO + SQUAWKS -->
+                <!-- LEFT SIDE: AC INFO + MAINTENANCE + SQUAWKS -->
                 <div class="mx-top-left">
                     @if (selectedAircraft is not null)
                     {
@@ -52,6 +53,28 @@
                             <div>Annual Due: @selectedAircraft.AnnualDueDate.ToShortDateString()</div>
                             <div>Open Squawks: @selectedAircraft.SquawkCount</div>
                         </div>
+
+                        <button class="mx-button" @onclick="OpenMxEditor">
+                            Edit MX Info
+                        </button>
+
+                        <!-- DERIVED AIRCRAFT MAINTENANCE PANELS -->
+                        @if (selectedAircraft is CessnaSkyhawk skyhawk)
+                        {
+                            <CessnaSkyhawkMaintenancePanel Aircraft="skyhawk" />
+                        }
+                        else if (selectedAircraft is PiperArrow arrow)
+                        {
+                            <PiperArrowMaintenancePanel Aircraft="arrow" />
+                        }
+                        else if (selectedAircraft is PiperSeminole seminole)
+                        {
+                            <PiperSeminoleMaintenancePanel Aircraft="seminole" />
+                        }
+                        else if (selectedAircraft is RobinsonR44 r44)
+                        {
+                            <RobinsonR44MaintenancePanel Aircraft="r44" />
+                        }
 
                         <h4 class="mx-subsection-title">Open Squawks</h4>
 
@@ -131,6 +154,39 @@
 
 </div>
 
+@if (showMxEditor && selectedAircraft is not null)
+{
+    <div class="mx-slideout">
+        <div class="mx-slideout-content">
+
+            <h3>Edit MX Info — @selectedAircraft.TailNumber</h3>
+
+            @if (selectedAircraft is CessnaSkyhawk skyhawk)
+            {
+                <CessnaSkyhawkMaintenanceEditor Aircraft="skyhawk" />
+            }
+            else if (selectedAircraft is PiperArrow arrow)
+            {
+                <PiperArrowMaintenanceEditor Aircraft="arrow" />
+            }
+            else if (selectedAircraft is PiperSeminole seminole)
+            {
+                <PiperSeminoleMaintenanceEditor Aircraft="seminole" />
+            }
+            else if (selectedAircraft is RobinsonR44 r44)
+            {
+                <RobinsonR44MaintenanceEditor Aircraft="r44" />
+            }
+
+            <button class="mx-button" @onclick="() => showMxEditor = false">
+                Close
+            </button>
+
+        </div>
+    </div>
+}
+
+
 @code {
     private List<AircraftBase>? aircraft;
     private AircraftBase? selectedAircraft;
@@ -140,6 +196,7 @@
 
     private string newSquawkText = string.Empty;
     private bool newSquawkIsGrounding = false;
+    private bool showMxEditor = false;
 
     private string resolutionNotes = string.Empty;
     private string mechanicSignoff = string.Empty;
@@ -213,5 +270,13 @@
 
         openSquawks = await Db.GetOpenSquawks(selectedAircraft.Id);
         selectedSquawk = null;
+    }
+
+    private void OpenMxEditor()
+    {
+        if (selectedAircraft is null)
+            return;
+
+        showMxEditor = true;
     }
 }
