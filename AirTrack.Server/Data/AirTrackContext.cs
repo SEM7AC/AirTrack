@@ -27,7 +27,10 @@ namespace AirTrack.Server.Data
             .HasIndex(a => a.TailNumber)
             .IsUnique();
 
-            
+           
+
+
+
 
 
             base.OnModelCreating(modelBuilder);

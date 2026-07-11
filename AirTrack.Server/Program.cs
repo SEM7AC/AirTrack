@@ -1,4 +1,4 @@
-using AirTrack.Server.Components;
+﻿using AirTrack.Server.Components;
 using AirTrack.Server.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +23,13 @@ namespace AirTrack.Server
                 .AddInteractiveServerComponents();
 
             var app = builder.Build();
+
+            // CREATE TABLES  
+            using (var scope = app.Services.CreateScope())
+                {
+                var db = scope.ServiceProvider.GetRequiredService<AirTrackContext>();
+                db.Database.EnsureCreated();
+                }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

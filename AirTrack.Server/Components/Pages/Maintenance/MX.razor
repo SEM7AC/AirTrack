@@ -207,7 +207,7 @@
         aircraft?.Where(a =>
             string.IsNullOrWhiteSpace(SearchText) ||
             a.TailNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            a.Model.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+            a.Model.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase)
         ) ?? Enumerable.Empty<AircraftBase>();
 
     protected override async Task OnInitializedAsync()

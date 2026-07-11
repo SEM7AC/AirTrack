@@ -6,7 +6,8 @@ namespace AirTrack.Server.Models.FormModel
         {
         // Identity
         public string TailNumber { get; set; } = string.Empty;
-        public string Model { get; set; } = string.Empty;
+        public AircraftModel Model { get; set; }
+            
         public int Year { get; set; }
         public string EngineType { get; set; } = string.Empty;
         public string FuelType { get; set; } = string.Empty;

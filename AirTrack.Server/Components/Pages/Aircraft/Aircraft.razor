@@ -64,7 +64,12 @@
 
                     <div class="form-row">
                         <label>Model</label>
-                        <InputText @bind-Value="AddModel.Model" />
+                        <InputSelect @bind-Value="AddModel.Model" @typeparam="AircraftModel">
+                            @foreach (var value in Enum.GetValues<AircraftModel>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
                     </div>
 
                     <div class="form-row">
@@ -178,7 +183,13 @@
 
                     <div class="form-row">
                         <label>Model</label>
-                        <InputText @bind-Value="EditModel.Model" />
+                        <InputSelect @bind-Value="EditModel.Model" @typeparam="AircraftModel">
+                            @foreach (var value in Enum.GetValues<AircraftModel>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
+
                     </div>
 
                     <div class="form-row">
@@ -301,11 +312,8 @@
     }
 
     private IEnumerable<AircraftBase> FilteredAircraft =>
-        AircraftData.Where(a =>
-            string.IsNullOrWhiteSpace(SearchText) ||
-            a.TailNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            a.Model.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-        );
+        AircraftData.Where(a => a.MatchesSearch(SearchText));
+
 
     private void SelectAircraft(AircraftBase a)
     {
@@ -347,53 +355,49 @@
     }
 
     private async Task AddAircraft()
+{
+    AircraftBase aircraft = AddModel.Model switch
     {
-        var aircraft = new GenericAircraft
-        {
-            TailNumber = AddModel.TailNumber,
-            Model = AddModel.Model,
-            Year = AddModel.Year,
-            EngineType = AddModel.EngineType,
-            FuelType = AddModel.FuelType,
-            Seats = AddModel.Seats,
-            Notes = AddModel.Notes,
-            Hobbs = AddModel.Hobbs,
-            Tach = AddModel.Tach,
-            AnnualDueDate = AddModel.AnnualDueDate,
-            Status = AddModel.Status,
-            Equipment = AddModel.Equipment
-        };
+        AircraftModel.Cessna172Skyhawk => new CessnaSkyhawk(),
+        AircraftModel.PiperPA28RArrow => new PiperArrow(),
+        AircraftModel.PiperPA44Seminole => new PiperSeminole(),
+        AircraftModel.RobinsonR44 => new RobinsonR44(),
+        _ => throw new Exception("Invalid aircraft model")
+    };
 
-        await Db.AddAircraft(aircraft);
-        await LoadAircraft();
-        await InvokeAsync(StateHasChanged);
-        ClearPanel();
+    aircraft.TailNumber = AddModel.TailNumber;
+    aircraft.Model = AddModel.Model;
+    aircraft.Year = AddModel.Year;
+    aircraft.EngineType = AddModel.EngineType;
+    aircraft.FuelType = AddModel.FuelType;
+    aircraft.Seats = AddModel.Seats;
+    aircraft.Notes = AddModel.Notes;
+    aircraft.Hobbs = AddModel.Hobbs;
+    aircraft.Tach = AddModel.Tach;
+    aircraft.AnnualDueDate = AddModel.AnnualDueDate;
+    aircraft.Status = AddModel.Status;
+    aircraft.Equipment = AddModel.Equipment;
 
-    }
+    await Db.AddAircraft(aircraft);
+    await LoadAircraft();
+    await InvokeAsync(StateHasChanged);
+    ClearPanel();
+}
+
 
     private async Task UpdateAircraft()
-    {
-        if (SelectedAircraft is null)
-            return;
+{
+    if (SelectedAircraft is null)
+        return;
 
-        SelectedAircraft.TailNumber = EditModel.TailNumber;
-        SelectedAircraft.Model = EditModel.Model;
-        SelectedAircraft.Year = EditModel.Year;
-        SelectedAircraft.EngineType = EditModel.EngineType;
-        SelectedAircraft.FuelType = EditModel.FuelType;
-        SelectedAircraft.Seats = EditModel.Seats;
-        SelectedAircraft.Notes = EditModel.Notes;
-        SelectedAircraft.Hobbs = EditModel.Hobbs;
-        SelectedAircraft.Tach = EditModel.Tach;
-        SelectedAircraft.Status = EditModel.Status;
-        SelectedAircraft.Equipment = EditModel.Equipment;
+    SelectedAircraft.UpdateFrom(EditModel);
 
-        await Db.UpdateAircraft(SelectedAircraft);
-        await LoadAircraft();
-        await InvokeAsync(StateHasChanged);
-        ClearPanel();
+    await Db.UpdateAircraft(SelectedAircraft);
+    await LoadAircraft();
+    await InvokeAsync(StateHasChanged);
+    ClearPanel();
+}
 
-    }
 
     private async Task DeleteAircraft()
     {
@@ -416,14 +420,25 @@
     }
 
     private void ToggleEquipment(AircraftFormModel model, OptionalEquipment value, object? isChecked)
-    {
-        bool checkedState = (bool)isChecked!;
+{
+    bool checkedState = (bool)isChecked!;
 
+    // Keep the form model in sync (Add panel + Edit panel)
+    if (checkedState)
+        model.Equipment |= value;
+    else
+        model.Equipment &= ~value;
+
+    // If we're editing an existing aircraft, also update the domain model
+    if (SelectedAircraft is not null && ReferenceEquals(model, EditModel))
+    {
         if (checkedState)
-            model.Equipment |= value;
+            SelectedAircraft.AddEquipment(value);
         else
-            model.Equipment &= ~value;
+            SelectedAircraft.RemoveEquipment(value);
     }
+}
+
 
     public class GenericAircraft : AircraftBase { }
 }

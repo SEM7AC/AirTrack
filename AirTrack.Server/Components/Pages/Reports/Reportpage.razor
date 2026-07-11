@@ -70,9 +70,11 @@
 
     async Task LoadDailyFlightReport()
 {
-    // Load fresh data so the method actually awaits something
     Aircraft = await Db.GetAllAircraft();
     Events = await Db.GetAllEvents();
+
+    var instructors = await Db.GetAllInstructors();
+    var students = await Db.GetAllStudents();
 
     ReportTitle = $"Daily Flight Activity — {DateTime.Today:MMM dd, yyyy}";
 
@@ -94,22 +96,33 @@
     {
         var ac = Aircraft.First(a => a.Id == ev.AircraftId);
 
+        var instructor = ev.InstructorId is null
+            ? null
+            : instructors.FirstOrDefault(i => i.Id == ev.InstructorId);
+
+        var student = ev.StudentId is null
+            ? null
+            : students.FirstOrDefault(s => s.Id == ev.StudentId);
+
         return new List<string>
         {
             ac.TailNumber,
             ev.Start.ToString("HH:mm"),
             ev.End.ToString("HH:mm"),
-            ev.InstructorId?.ToString() ?? "—",
-            ev.StudentId?.ToString() ?? "—"
+            instructor?.FullName ?? "—",
+            student?.FullName ?? "—"
         };
     }).ToList();
 }
+
 
 
     async Task LoadAircraftStatusReport()
 {
     // Load fresh data so the method actually awaits something
     Aircraft = await Db.GetAllAircraft();
+    
+
 
     ReportTitle = "Aircraft Status Report";
 
@@ -134,7 +147,7 @@
         ReportRows.Add(new List<string>
         {
             ac.TailNumber,
-            ac.Model,
+            ac.Model.ToString(),
             ac.Hobbs.ToString("0.0"),
             ac.Tach.ToString("0.0"),
             ac.AnnualDueDate.ToShortDateString(),
