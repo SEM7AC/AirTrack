@@ -174,48 +174,33 @@
     }
 
     private IEnumerable<Instructor> FilteredInstructors =>
-        InstructorsData.Where(i =>
-            string.IsNullOrWhiteSpace(SearchText) ||
-            i.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            i.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            i.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-        );
+        InstructorsData.Where(i => i.MatchesSearch(SearchText));
+
 
     private void SelectInstructor(Instructor i)
     {
         SelectedInstructor = i;
 
-        EditModel = new Instructor
-        {
-            Id = i.Id,
-            FirstName = i.FirstName,
-            LastName = i.LastName,
-            Email = i.Email,
-            Phone = i.Phone,
-            Certifications = i.Certifications,
-            HireDate = i.HireDate,
-            Status = i.Status
-        };
+        EditModel = i.Clone();
+
 
         ActivePanel = "edit";
     }
 
     private void ShowAddPanel()
     {
-        AddModel = new Instructor
-        {
-            HireDate = DateTime.Now,
-            Status = PersonStatus.Active
-        };
+        AddModel = Instructor.CreateNew();
 
         ActivePanel = "add";
     }
 
     private async Task AddInstructor()
     {
+        AddModel.ApplyNormalization();
         await Db.AddInstructor(AddModel);
         await LoadInstructors();
         ClearPanel();
+
     }
 
     private async Task UpdateInstructor()
@@ -224,6 +209,7 @@
             return;
 
         EditModel.Id = SelectedInstructor.Id;
+        EditModel.ApplyNormalization();
 
         await Db.UpdateInstructor(EditModel);
         await LoadInstructors();
@@ -243,8 +229,9 @@
     private void ClearPanel()
     {
         SelectedInstructor = null;
-        AddModel = new();
-        EditModel = new();
+        AddModel = Instructor.CreateNew();
+        EditModel = Instructor.CreateNew();
+
         ActivePanel = "";
     }
 }
