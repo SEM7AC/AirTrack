@@ -163,71 +163,52 @@
     private string SearchText = "";
 
     protected override async Task OnInitializedAsync()
-    {
+        {
         await LoadStudents();
-    }
+        }
 
     private async Task LoadStudents()
-    {
+        {
         StudentsData = await Db.GetAllStudents();
-    }
+        }
 
     private IEnumerable<Student> FilteredStudents =>
-        StudentsData.Where(s =>
-            string.IsNullOrWhiteSpace(SearchText) ||
-            s.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            s.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            s.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-        );
+        StudentsData.Where(s => s.MatchesSearch(SearchText));
 
     private void SelectStudent(Student s)
-    {
-        SelectedStudent = s;
-
-        EditModel = new Student
         {
-            Id = s.Id,
-            FirstName = s.FirstName,
-            LastName = s.LastName,
-            Email = s.Email,
-            Phone = s.Phone,
-            EnrollmentDate = s.EnrollmentDate,
-            Status = s.Status,
-            AssignedInstructorId = s.AssignedInstructorId
-        };
+        SelectedStudent = s;
+        EditModel = s.Clone();        
 
         ActivePanel = "edit";
     }
 
     private void ShowAddPanel()
     {
-        AddModel = new Student
-        {
-            EnrollmentDate = DateTime.Now,
-            Status = PersonStatus.Active
-        };
-
+        AddModel = Student.CreateNew();
         ActivePanel = "add";
     }
 
     private async Task AddStudent()
-    {
-        await Db.AddStudent(AddModel);
-        await LoadStudents();
-        ClearPanel();
-    }
+{
+    AddModel.ApplyNormalization();
+    await Db.AddStudent(AddModel);
+    await LoadStudents();
+    ClearPanel();
+}
 
     private async Task UpdateStudent()
-    {
-        if (SelectedStudent is null)
-            return;
+{
+    if (SelectedStudent is null)
+        return;
 
-        EditModel.Id = SelectedStudent.Id;
+    EditModel.Id = SelectedStudent.Id;
+    EditModel.ApplyNormalization();
 
-        await Db.UpdateStudent(EditModel);
-        await LoadStudents();
-        ClearPanel();
-    }
+    await Db.UpdateStudent(EditModel);
+    await LoadStudents();
+    ClearPanel();
+}
 
     private async Task DeleteStudent()
     {
