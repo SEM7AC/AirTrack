@@ -179,48 +179,29 @@
     }
 
     private IEnumerable<Mechanic> FilteredMechanics =>
-        MechanicsData.Where(m =>
-            string.IsNullOrWhiteSpace(SearchText) ||
-            m.FirstName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            m.LastName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-            m.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-        );
+        MechanicsData.Where(m => m.MatchesSearch(SearchText));
 
     private void SelectMechanic(Mechanic m)
     {
         SelectedMechanic = m;
-
-        EditModel = new Mechanic
-        {
-            Id = m.Id,
-            FirstName = m.FirstName,
-            LastName = m.LastName,
-            Email = m.Email,
-            Phone = m.Phone,
-            CertificationNumber = m.CertificationNumber,
-            HireDate = m.HireDate,
-            Status = m.Status
-        };
-
+        EditModel = m.Clone();
         ActivePanel = "edit";
     }
 
     private void ShowAddPanel()
     {
-        AddModel = new Mechanic
-        {
-            HireDate = DateTime.Now,
-            Status = PersonStatus.Active
-        };
+        AddModel = Mechanic.CreateNew();
 
         ActivePanel = "add";
     }
 
     private async Task AddMechanic()
     {
+        AddModel.ApplyNormalization();
         await Db.AddMechanic(AddModel);
         await LoadMechanics();
         ClearPanel();
+
     }
 
     private async Task UpdateMechanic()
@@ -229,10 +210,12 @@
             return;
 
         EditModel.Id = SelectedMechanic.Id;
+        EditModel.ApplyNormalization();
 
         await Db.UpdateMechanic(EditModel);
         await LoadMechanics();
         ClearPanel();
+
     }
 
     private async Task DeleteMechanic()
@@ -248,8 +231,8 @@
     private void ClearPanel()
     {
         SelectedMechanic = null;
-        AddModel = new();
-        EditModel = new();
+        AddModel = Mechanic.CreateNew();
+        EditModel = Mechanic.CreateNew();
         ActivePanel = "";
     }
 }
