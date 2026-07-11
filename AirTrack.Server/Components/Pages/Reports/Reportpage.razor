@@ -1,0 +1,180 @@
+﻿@page "/reportpage"
+@rendermode InteractiveServer
+
+@using AirTrack.Server.Data
+@using AirTrack.Server.Models.Aircraft
+@using AirTrack.Server.Models.Scheduler
+@using AirTrack.Server.Models.Maintenance
+
+@inject DbHelper Db
+
+<div class="page">
+
+    <h2>Reports</h2>
+
+    <div class="top-buttons">
+        <button @onclick="LoadDailyFlightReport">Daily Flight Report</button>
+        <button @onclick="LoadAircraftStatusReport">Aircraft Status Report</button>
+        <button @onclick="LoadOpenSquawksReport">Open Squawks Report</button>
+    </div>
+
+    <div class="report-container">
+        <h3>@ReportTitle</h3>
+
+        @if (ReportRows?.Any() == true)
+        {
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        @foreach (var col in ReportColumns)
+                        {
+                            <th>@col</th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var row in ReportRows)
+                    {
+                        <tr>
+                            @foreach (var cell in row)
+                            {
+                                <td>@cell</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No data available.</p>
+        }
+    </div>
+
+</div>
+
+@code {
+    string ReportTitle = "";
+    List<string> ReportColumns = new();
+    List<List<string>> ReportRows = new();
+
+    List<AircraftBase> Aircraft = new();
+    List<FlightEvent> Events = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Aircraft = await Db.GetAllAircraft();
+        Events = await Db.GetAllEvents();
+    }
+
+    async Task LoadDailyFlightReport()
+{
+    // Load fresh data so the method actually awaits something
+    Aircraft = await Db.GetAllAircraft();
+    Events = await Db.GetAllEvents();
+
+    ReportTitle = $"Daily Flight Activity — {DateTime.Today:MMM dd, yyyy}";
+
+    ReportColumns = new()
+    {
+        "Aircraft",
+        "Start",
+        "End",
+        "Instructor",
+        "Student"
+    };
+
+    var todaysEvents = Events
+        .Where(e => e.Start.Date == DateTime.Today)
+        .OrderBy(e => e.Start)
+        .ToList();
+
+    ReportRows = todaysEvents.Select(ev =>
+    {
+        var ac = Aircraft.First(a => a.Id == ev.AircraftId);
+
+        return new List<string>
+        {
+            ac.TailNumber,
+            ev.Start.ToString("HH:mm"),
+            ev.End.ToString("HH:mm"),
+            ev.InstructorId?.ToString() ?? "—",
+            ev.StudentId?.ToString() ?? "—"
+        };
+    }).ToList();
+}
+
+
+    async Task LoadAircraftStatusReport()
+{
+    // Load fresh data so the method actually awaits something
+    Aircraft = await Db.GetAllAircraft();
+
+    ReportTitle = "Aircraft Status Report";
+
+    ReportColumns = new()
+    {
+        "Tail Number",
+        "Model",
+        "Hobbs",
+        "Tach",
+        "Annual Due",
+        "Open Squawks"
+    };
+
+    // Build rows
+    ReportRows = new();
+
+    foreach (var ac in Aircraft)
+    {
+        // Get squawk count fresh from DB
+        var openSq = await Db.GetOpenSquawksCount(ac.Id);
+
+        ReportRows.Add(new List<string>
+        {
+            ac.TailNumber,
+            ac.Model,
+            ac.Hobbs.ToString("0.0"),
+            ac.Tach.ToString("0.0"),
+            ac.AnnualDueDate.ToShortDateString(),
+            openSq.ToString()
+        });
+    }
+}
+
+
+    async Task LoadOpenSquawksReport()
+    {
+        ReportTitle = "Open Squawks Report";
+
+        ReportColumns = new()
+        {
+            "Aircraft",
+            "Description",
+            "Grounding",
+            "Reported At"
+        };
+
+        var allSquawks = new List<Squawk>();
+
+        foreach (var ac in Aircraft)
+        {
+            var sq = await Db.GetOpenSquawks(ac.Id);
+            allSquawks.AddRange(sq);
+        }
+
+        ReportRows = allSquawks.Select(s =>
+        {
+            var ac = Aircraft.First(a => a.Id == s.AircraftId);
+
+            return new List<string>
+            {
+                ac.TailNumber,
+                s.Description,
+                s.IsGrounding ? "YES" : "NO",
+                s.ReportedAt.ToString("MMM dd, yyyy HH:mm")
+            };
+        }).ToList();
+    }
+}
