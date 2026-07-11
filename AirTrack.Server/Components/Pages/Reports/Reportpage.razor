@@ -62,100 +62,104 @@
     List<AircraftBase> Aircraft = new();
     List<FlightEvent> Events = new();
 
-    protected override async Task OnParametersSetAsync()
-    {
+    protected override async Task OnInitializedAsync()
+        {
         Aircraft = await Db.GetAllAircraft();
         Events = await Db.GetAllEvents();
-    }
+        }
+
+    private async Task ReloadCoreData()
+        {
+        Aircraft = await Db.GetAllAircraft();
+        Events = await Db.GetAllEvents();
+        }
 
     async Task LoadDailyFlightReport()
-{
-    Aircraft = await Db.GetAllAircraft();
-    Events = await Db.GetAllEvents();
-
-    var instructors = await Db.GetAllInstructors();
-    var students = await Db.GetAllStudents();
-
-    ReportTitle = $"Daily Flight Activity — {DateTime.Today:MMM dd, yyyy}";
-
-    ReportColumns = new()
     {
-        "Aircraft",
-        "Start",
-        "End",
-        "Instructor",
-        "Student"
-    };
+    
+        await ReloadCoreData();
 
-    var todaysEvents = Events
-        .Where(e => e.Start.Date == DateTime.Today)
-        .OrderBy(e => e.Start)
-        .ToList();
+        var instructors = await Db.GetAllInstructors();
+        var students = await Db.GetAllStudents();
 
-    ReportRows = todaysEvents.Select(ev =>
-    {
-        var ac = Aircraft.First(a => a.Id == ev.AircraftId);
+        ReportTitle = $"Daily Flight Activity — {DateTime.Today:MMM dd, yyyy}";
 
-        var instructor = ev.InstructorId is null
-            ? null
-            : instructors.FirstOrDefault(i => i.Id == ev.InstructorId);
-
-        var student = ev.StudentId is null
-            ? null
-            : students.FirstOrDefault(s => s.Id == ev.StudentId);
-
-        return new List<string>
+        ReportColumns = new()
         {
-            ac.TailNumber,
-            ev.Start.ToString("HH:mm"),
-            ev.End.ToString("HH:mm"),
-            instructor?.FullName ?? "—",
-            student?.FullName ?? "—"
+            "Aircraft",
+            "Start",
+            "End",
+            "Instructor",
+            "Student"
         };
-    }).ToList();
-}
 
+        var todaysEvents = Events
+            .Where(e => e.Start.Date == DateTime.Today)
+            .OrderBy(e => e.Start)
+            .ToList();
 
+        ReportRows = todaysEvents.Select(ev =>
+        {
+            var ac = Aircraft.First(a => a.Id == ev.AircraftId);
+
+            var instructor = ev.InstructorId is null
+                ? null
+                : instructors.FirstOrDefault(i => i.Id == ev.InstructorId);
+
+            var student = ev.StudentId is null
+                ? null
+                : students.FirstOrDefault(s => s.Id == ev.StudentId);
+
+            return new List<string>
+            {
+                ac.TailNumber,
+                ev.Start.ToString("HH:mm"),
+                ev.End.ToString("HH:mm"),
+                instructor?.FullName ?? "—",
+                student?.FullName ?? "—"
+            };
+        }).ToList();
+    }
 
     async Task LoadAircraftStatusReport()
-{
-    // Load fresh data so the method actually awaits something
-    Aircraft = await Db.GetAllAircraft();
+    {
+        // Load fresh data so the method actually awaits something
+        await ReloadCoreData();
+
     
 
 
-    ReportTitle = "Aircraft Status Report";
+        ReportTitle = "Aircraft Status Report";
 
-    ReportColumns = new()
-    {
-        "Tail Number",
-        "Model",
-        "Hobbs",
-        "Tach",
-        "Annual Due",
-        "Open Squawks"
-    };
-
-    // Build rows
-    ReportRows = new();
-
-    foreach (var ac in Aircraft)
-    {
-        // Get squawk count fresh from DB
-        var openSq = await Db.GetOpenSquawksCount(ac.Id);
-
-        ReportRows.Add(new List<string>
+        ReportColumns = new()
         {
-            ac.TailNumber,
-            ac.Model.ToString(),
-            ac.Hobbs.ToString("0.0"),
-            ac.Tach.ToString("0.0"),
-            ac.AnnualDueDate.ToShortDateString(),
-            openSq.ToString()
-        });
-    }
-}
+            "Tail Number",
+            "Model",
+            "Hobbs",
+            "Tach",
+            "Annual Due",
+            "Open Squawks"
+        };
 
+        // Build rows
+        ReportRows = new();
+
+        foreach (var ac in Aircraft)
+        {
+            // Get squawk count fresh from DB
+            var openSq = await Db.GetOpenSquawksCount(ac.Id);
+
+            ReportRows.Add(new List<string>
+            {
+                ac.TailNumber,
+                ac.Model.GetDescription(),
+                ac.Hobbs.ToString("0.0"),
+                ac.Tach.ToString("0.0"),
+                ac.AnnualDueDate.ToShortDateString(),
+                openSq.ToString()
+            });
+        }
+    }
 
     async Task LoadOpenSquawksReport()
     {
@@ -169,6 +173,8 @@
             "Reported At"
         };
 
+        await ReloadCoreData();
+
         var allSquawks = new List<Squawk>();
 
         foreach (var ac in Aircraft)
@@ -176,6 +182,7 @@
             var sq = await Db.GetOpenSquawks(ac.Id);
             allSquawks.AddRange(sq);
         }
+
 
         ReportRows = allSquawks.Select(s =>
         {
