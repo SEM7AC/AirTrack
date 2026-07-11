@@ -1,9 +1,9 @@
-﻿namespace AirTrack.Server.Models.People
+﻿namespace AirTrack.Server.Models.People;
+
+public enum PersonStatus
     {
-    public enum PersonStatus
-        {
-        Active = 1,
-        Inactive = 2,
-        Suspended = 3
-        }
+    Active = 1,
+    Inactive = 2,
+    Suspended = 3
     }
+
