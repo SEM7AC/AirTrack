@@ -94,6 +94,23 @@ public abstract class AircraftBase
         Equipment = model.Equipment;
         }
 
+    public void ApplyFrom(AircraftFormModel form)
+        {
+        TailNumber = form.TailNumber;
+        Model = form.Model;
+        Year = form.Year;
+        EngineType = form.EngineType;
+        FuelType = form.FuelType;
+        Seats = form.Seats;
+        Notes = form.Notes;
+        Hobbs = form.Hobbs;
+        Tach = form.Tach;
+        AnnualDueDate = form.AnnualDueDate;
+        Status = form.Status;
+        Equipment = form.Equipment;
+        }
+
+
 
 
 

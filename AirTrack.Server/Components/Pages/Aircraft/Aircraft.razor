@@ -319,22 +319,9 @@
     {
         SelectedAircraft = a;
 
-        EditModel = new AircraftFormModel
-        {
-            TailNumber = a.TailNumber,
-            Model = a.Model,
-            Year = a.Year,
-            EngineType = a.EngineType,
-            FuelType = a.FuelType,
-            Seats = a.Seats,
-            Notes = a.Notes,
-            Hobbs = a.Hobbs,
-            Tach = a.Tach,
-            AnnualDueDate = a.AnnualDueDate,
-            Status = a.Status,
-            Equipment = a.Equipment
-        };
-
+        EditModel = AircraftFormModel.CreateNew();
+        EditModel.CloneFrom(a);
+    
         ActivePanel = "edit";
     }
 
@@ -343,47 +330,31 @@
         Console.WriteLine("ADD BUTTON FIRED");
 
         SelectedAircraft = null;
-        AddModel = new AircraftFormModel
-        {
-            
-            AnnualDueDate = DateTime.Now,
-            Status = AircraftStatus.Available,
-            Equipment = OptionalEquipment.None
-        };
+        AddModel = AircraftFormModel.CreateNew();
 
         ActivePanel = "add";
     }
 
     private async Task AddAircraft()
-{
-    AircraftBase aircraft = AddModel.Model switch
     {
-        AircraftModel.Cessna172Skyhawk => new CessnaSkyhawk(),
-        AircraftModel.PiperPA28RArrow => new PiperArrow(),
-        AircraftModel.PiperPA44Seminole => new PiperSeminole(),
-        AircraftModel.RobinsonR44 => new RobinsonR44(),
-        _ => throw new Exception("Invalid aircraft model")
-    };
+        AircraftBase aircraft = AddModel.Model switch
+        {
+            AircraftModel.Cessna172Skyhawk => new CessnaSkyhawk(),
+            AircraftModel.PiperPA28RArrow => new PiperArrow(),
+            AircraftModel.PiperPA44Seminole => new PiperSeminole(),
+            AircraftModel.RobinsonR44 => new RobinsonR44(),
+            _ => throw new Exception("Invalid aircraft model")
+        };
 
-    aircraft.TailNumber = AddModel.TailNumber;
-    aircraft.Model = AddModel.Model;
-    aircraft.Year = AddModel.Year;
-    aircraft.EngineType = AddModel.EngineType;
-    aircraft.FuelType = AddModel.FuelType;
-    aircraft.Seats = AddModel.Seats;
-    aircraft.Notes = AddModel.Notes;
-    aircraft.Hobbs = AddModel.Hobbs;
-    aircraft.Tach = AddModel.Tach;
-    aircraft.AnnualDueDate = AddModel.AnnualDueDate;
-    aircraft.Status = AddModel.Status;
-    aircraft.Equipment = AddModel.Equipment;
+        AddModel.ApplyNormalization();
 
-    await Db.AddAircraft(aircraft);
-    await LoadAircraft();
-    await InvokeAsync(StateHasChanged);
-    ClearPanel();
-}
+        aircraft.ApplyFrom(AddModel);
 
+        await Db.AddAircraft(aircraft);
+        await LoadAircraft();
+        await InvokeAsync(StateHasChanged);
+        ClearPanel();
+    }
 
     private async Task UpdateAircraft()
 {
@@ -397,7 +368,6 @@
     await InvokeAsync(StateHasChanged);
     ClearPanel();
 }
-
 
     private async Task DeleteAircraft()
     {
@@ -414,8 +384,9 @@
     private void ClearPanel()
     {
         SelectedAircraft = null;
-        AddModel = new();
-        EditModel = new();
+        AddModel = AircraftFormModel.CreateNew();
+        EditModel = AircraftFormModel.CreateNew();
+
         ActivePanel = "";
     }
 
@@ -438,7 +409,6 @@
             SelectedAircraft.RemoveEquipment(value);
     }
 }
-
 
     public class GenericAircraft : AircraftBase { }
 }
