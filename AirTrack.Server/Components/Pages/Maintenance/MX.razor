@@ -3,6 +3,7 @@
 @using AirTrack.Server.Models.Aircraft
 @using AirTrack.Server.Models.Maintenance
 @using AirTrack.Server.Components.UI.MX
+@using AirTrack.Server.Models.Scheduler
 @rendermode InteractiveServer
 @inject DbHelper Db
 
@@ -211,19 +212,21 @@
         ) ?? Enumerable.Empty<AircraftBase>();
 
     protected override async Task OnInitializedAsync()
-    {
+        {
         await LoadData();
-    }
+        }
 
     private async Task LoadData()
-    {
+        {
         aircraft = await Db.GetAllAircraft();
-    }
+        }
 
     private async Task SelectAircraft(int id)
     {
-        selectedAircraft = await Db.GetAircraft(id);
-        openSquawks = await Db.GetOpenSquawks(id);
+        var result = await Db.GetMaintenanceAircraftAsync(id);
+
+        selectedAircraft = result.Aircraft;
+        openSquawks = result.OpenSquawks;
         selectedSquawk = null;
     }
 
@@ -239,15 +242,7 @@
         if (string.IsNullOrWhiteSpace(newSquawkText) || selectedAircraft is null)
             return;
 
-        var squawk = new Squawk
-        {
-            AircraftId = selectedAircraft.Id,
-            Description = newSquawkText,
-            IsGrounding = newSquawkIsGrounding,
-            ReportedAt = DateTime.UtcNow
-        };
-
-        await Db.AddSquawk(squawk);
+        await Db.AddSquawkAndRefreshAsync(selectedAircraft, newSquawkText, newSquawkIsGrounding);
 
         newSquawkText = string.Empty;
         newSquawkIsGrounding = false;
@@ -255,12 +250,14 @@
         openSquawks = await Db.GetOpenSquawks(selectedAircraft.Id);
     }
 
+
     private async Task ResolveSquawk()
     {
         if (selectedSquawk is null || selectedAircraft is null)
             return;
 
-        await Db.ResolveSquawk(
+        await Db.ResolveSquawkAndRefreshAsync(
+            selectedAircraft,
             selectedSquawk.Id,
             resolutionNotes,
             mechanicSignoff);
@@ -272,6 +269,7 @@
         selectedSquawk = null;
     }
 
+
     private void OpenMxEditor()
     {
         if (selectedAircraft is null)
@@ -281,16 +279,20 @@
     }
 
     private async Task SaveMxInfo()
-{
-    if (selectedAircraft is null)
-        return;
+    {
+        if (selectedAircraft is null)
+            return;
 
-    await Db.UpdateAircraft(selectedAircraft);
+        var result = await Db.SaveMxInfoAndRefreshAsync(selectedAircraft);
 
-    aircraft = await Db.GetAllAircraft();
-    openSquawks = await Db.GetOpenSquawks(selectedAircraft.Id);
+        aircraft = result.AircraftList;
+        openSquawks = result.OpenSquawks;
 
-    showMxEditor = false;
-}
+        showMxEditor = false;
+    }
 
-}
+
+
+
+
+} 

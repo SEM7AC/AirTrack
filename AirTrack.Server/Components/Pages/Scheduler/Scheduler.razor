@@ -45,10 +45,10 @@
                     <div class="aircraft-column">
                         <div class="aircraft-header">@ac.TailNumber</div>
 
-                        @foreach (var ev in Events.Where(e => e.AircraftId == ac.Id))
+                        @foreach (var ev in Db.FilterEventsByAircraft(Events, ac.Id))
                         {
-                            <div @key="ev.Id" class="event-sample" style="@GetEventStyle(ev)">
-                                @RenderEventLabel(ev)
+                            <div @key="ev.Id" class="event-sample" style="@Db.GetEventStyle(ev)">
+                                @Db.GetEventLabel(ev, Instructors, Students)
                             </div>
                         }
                     </div>
@@ -77,9 +77,9 @@
                 <label>Event</label>
                 <select value="@SelectedEventId" @onchange="OnEventChangedHandler">
                     <option value="">-- Select Event --</option>
-                    @foreach (var ev in FilteredEvents)
+                    @foreach (var ev in Db.FilterEventsByAircraft(Events, SelectedAircraftId ?? 0))
                     {
-                        <option value="@ev.Id">@($"{ev.Start:HH:mm}-{ev.End:HH:mm}")</option>
+                         <option value="@ev.Id">@($"{ev.Start:HH:mm}-{ev.End:HH:mm}")</option>
                     }
                 </select>
             }
@@ -140,9 +140,7 @@
     List<Instructor> Instructors = new();
     List<Student> Students = new();
     List<Mechanic> Mechanics = new();
-    List<FlightEvent> Events = new();
-    List<FlightEvent> FilteredEvents = new();
-
+    List<FlightEvent> Events = new();  
     FlightEventFormModel CurrentEvent = new();
 
     int? SelectedAircraftId { get; set; }
@@ -157,11 +155,14 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        AircraftList = await Db.GetAllAircraft();
-        Instructors = await Db.GetAllInstructors();
-        Students = await Db.GetAllStudents();
-        Mechanics = await Db.GetAllMechanics();
-        await LoadEventsForDay();
+        var data = await Db.RefreshSchedulerAsync(CurrentSchedulerDate);
+
+        AircraftList = data.Aircraft;
+        Instructors = data.Instructors;
+        Students = data.Students;
+        Mechanics = data.Mechanics;
+        Events = data.Events;
+
 
     }
 
@@ -174,13 +175,9 @@
         SelectedAircraftId = null;
         SelectedEventId = null;
 
-        CurrentEvent = new FlightEventFormModel
-        {
-            Start = CurrentSchedulerDate.Date.AddHours(8),
-            End = CurrentSchedulerDate.Date.AddHours(9)
-        };
+        CurrentEvent = Db.CreateDefaultEvent(CurrentSchedulerDate);      
 
-        FilteredEvents = new();
+        
         ShowDrawer = true;
     }
 
@@ -193,13 +190,9 @@
         SelectedAircraftId = null;
         SelectedEventId = null;
 
-        CurrentEvent = new FlightEventFormModel
-        {
-            Start = CurrentSchedulerDate.Date.AddHours(8),
-            End = CurrentSchedulerDate.Date.AddHours(9)
-        };
+        CurrentEvent = Db.CreateDefaultEvent(CurrentSchedulerDate);
 
-        FilteredEvents = new();
+        
         ShowDrawer = true;
     }
 
@@ -212,13 +205,9 @@
         SelectedAircraftId = null;
         SelectedEventId = null;
 
-        CurrentEvent = new FlightEventFormModel
-        {
-            Start = CurrentSchedulerDate.Date,
-            End = CurrentSchedulerDate.Date
-        };
+        CurrentEvent = Db.CreateDefaultEvent(CurrentSchedulerDate);
 
-        FilteredEvents = new();
+        
         ShowDrawer = true;
     }
 
@@ -227,17 +216,16 @@
         if (int.TryParse(e.Value?.ToString(), out var id))
         {
             SelectedAircraftId = id;
-
-            
+                        
             CurrentEvent.AircraftId = id;
 
-            FilteredEvents = Events.Where(ev => ev.AircraftId == id).ToList();
+            var filtered = Db.FilterEventsByAircraft(Events, id);
         }
         else
         {
             SelectedAircraftId = null;
             CurrentEvent.AircraftId = null;
-            FilteredEvents = new();
+            
         }
     }
 
@@ -250,57 +238,49 @@
 
         var ev = Events.First(x => x.Id == id);
 
-        CurrentEvent = new FlightEventFormModel
-        {
-            Id = ev.Id,
-            AircraftId = ev.AircraftId,
-            InstructorId = ev.InstructorId,
-            StudentId = ev.StudentId,
-            MechanicId = ev.MechanicId,
-            Start = ev.Start,
-            End = ev.End
-        };
+        CurrentEvent = Db.MapToFormModel(ev);
 
         CurrentSchedulerDate = ev.Start.Date;
     }
 
     async Task SaveEvent()
     {
-        // DO NOT SAVE AircraftId = 0
         if (CurrentEvent.AircraftId is null)
             return;
 
-        var entity = new FlightEvent
-        {
-            Id = CurrentEvent.Id ?? 0,
-            AircraftId = CurrentEvent.AircraftId.Value,
-            InstructorId = CurrentEvent.InstructorId,
-            StudentId = CurrentEvent.StudentId,
-            MechanicId = CurrentEvent.MechanicId,
-            Start = CurrentEvent.Start,
-            End = CurrentEvent.End
-        };
+        var entity = Db.MapToEntity(CurrentEvent);
 
         if (IsEditing)
             await Db.UpdateEvent(entity);
         else
             await Db.AddEvent(entity);
 
-        AircraftList = await Db.GetAllAircraft();
-        Instructors = await Db.GetAllInstructors();
-        Students = await Db.GetAllStudents();
-        Mechanics = await Db.GetAllMechanics();
-        await LoadEventsForDay();
+        var data = await Db.RefreshSchedulerAsync(CurrentSchedulerDate);
+
+        AircraftList = data.Aircraft;
+        Instructors = data.Instructors;
+        Students = data.Students;
+        Mechanics = data.Mechanics;
+        Events = data.Events;
 
         CloseDrawer();
     }
+
 
     async Task ConfirmDelete()
     {
         if (SelectedEventId is int id)
             await Db.DeleteEvent(id);
 
-            await LoadEventsForDay();
+            var data = await Db.RefreshSchedulerAsync(CurrentSchedulerDate);
+
+            AircraftList = data.Aircraft;
+            Instructors = data.Instructors;
+            Students = data.Students;
+            Mechanics = data.Mechanics;
+            Events = data.Events;
+
+
 
         CloseDrawer();
     }
@@ -309,73 +289,46 @@
     {
         ShowDrawer = false;
     }
-
-    string GetEventStyle(FlightEvent ev)
-    {
-        double hourHeight = 60;
-        double pxPerMinute = hourHeight / 60.0;
-
-        var start = ev.Start;
-        var end = ev.End;
-
-        double startOffset = Math.Ceiling(start.TimeOfDay.TotalMinutes * pxPerMinute);
-        double duration = Math.Ceiling((end - start).TotalMinutes * pxPerMinute);
-
-        if (duration < 15)
-            duration = 15;
-
-        return $"top:{startOffset}px;height:{duration}px;";
-    }
-
-    string RenderEventLabel(FlightEvent ev)
-    {
-        var instructor = Instructors.FirstOrDefault(i => i.Id == ev.InstructorId);
-        var student = Students.FirstOrDefault(s => s.Id == ev.StudentId);
-
-        if (instructor is not null && student is not null)
-            return $"{instructor.LastName}/{student.LastName}";
-
-        if (instructor is not null)
-            return instructor.LastName;
-
-        if (student is not null)
-            return student.LastName;
-
-        return $"{ev.Start:HH:mm}-{ev.End:HH:mm}";
-    }
-
+        
     async Task PrevDay()
 {
     CurrentSchedulerDate = CurrentSchedulerDate.AddDays(-1);
-    await LoadEventsForDay();
+    var data = await Db.RefreshSchedulerAsync(CurrentSchedulerDate);
+        AircraftList = data.Aircraft;
+        Instructors = data.Instructors;
+        Students = data.Students;
+        Mechanics = data.Mechanics;
+        Events = data.Events;
+
+
 }
 
     async Task NextDay()
 {
     CurrentSchedulerDate = CurrentSchedulerDate.AddDays(1);
-    await LoadEventsForDay();
+    var data = await Db.RefreshSchedulerAsync(CurrentSchedulerDate);
+        AircraftList = data.Aircraft;
+        Instructors = data.Instructors;
+        Students = data.Students;
+        Mechanics = data.Mechanics;
+        Events = data.Events;
+
 }
 
     async Task GoToday()
 {
     CurrentSchedulerDate = DateTime.Today;
-    await LoadEventsForDay();
+    var data = await Db.RefreshSchedulerAsync(CurrentSchedulerDate);
+        AircraftList = data.Aircraft;
+        Instructors = data.Instructors;
+        Students = data.Students;
+        Mechanics = data.Mechanics;
+        Events = data.Events;
+
+
 }
     
-    async Task LoadEventsForDay()
-{
-    var all = await Db.GetAllEvents();
-
-    Events = all
-        .Where(e => e.Start.Date == CurrentSchedulerDate.Date)
-        .ToList();
-
-    // Reset selection state
-    FilteredEvents = new();
-    SelectedEventId = null;
-
-    StateHasChanged();
-}
+    
 
 
 }

@@ -1,5 +1,7 @@
-﻿using AirTrack.Server.Models.Aircraft;
+﻿using AirTrack.Server.Data;
+using AirTrack.Server.Models.Aircraft;
 using AirTrack.Server.Models.FormModel;
+using AirTrack.Server.Models.Scheduler;
 
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -109,6 +111,116 @@ public abstract class AircraftBase
         Status = form.Status;
         Equipment = form.Equipment;
         }
+    public bool IsMaintenanceDue(DateTime now)
+        {
+        var hobbs = Hobbs;
+
+        switch (this)
+            {
+            case CessnaSkyhawk s:
+                if (hobbs >= s.LastOilChange + 50) return true;
+                if (hobbs >= s.Last50Hr + 50) return true;
+                if (hobbs >= s.Last100Hr + 100) return true;
+
+                if (s.ELTInspectionDue is not null && s.ELTInspectionDue <= now) return true;
+                if (s.TransponderDue is not null && s.TransponderDue <= now) return true;
+                if (s.PitotStaticDue is not null && s.PitotStaticDue <= now) return true;
+
+                return false;
+
+            case PiperArrow pa:
+                if (hobbs >= pa.LastOilChange + 50) return true;
+                if (hobbs >= pa.Last100Hr + 100) return true;
+
+                if (pa.LastGearCyclesInspection >= 200) return true;
+
+                if (pa.PropOverhaulDue is not null && pa.PropOverhaulDue <= now) return true;
+
+                return false;
+
+            case PiperSeminole ps:
+                if (hobbs >= ps.LastLeftEngineHobbs + 50) return true;
+                if (hobbs >= ps.LastRightEngineHobbs + 50) return true;
+                if (hobbs >= ps.Last100Hr + 100) return true;
+
+                if (ps.LastGearCyclesInspection >= 200) return true;
+
+                if (ps.LeftPropOverhaulDue is not null && ps.LeftPropOverhaulDue <= now) return true;
+                if (ps.RightPropOverhaulDue is not null && ps.RightPropOverhaulDue <= now) return true;
+
+                return false;
+
+            case RobinsonR44 r:
+                if (hobbs >= r.Last2200HrOverhaul + 2200) return true;
+
+                if (r.BladeLifeRemaining <= 0) return true;
+
+                if (r.ClutchActuationCount >= 200) return true;
+
+                if (r.GovernorInspectionDue is not null && r.GovernorInspectionDue <= now) return true;
+
+                return false;
+
+            default:
+                return false;
+            }
+        }
+
+    
+    public AircraftStatus CalculateStatus(IReadOnlyList<FlightEvent> events,bool hasGroundingSquawk)
+        {
+        var now = DateTime.Now;
+
+        if (hasGroundingSquawk)
+            return AircraftStatus.Maintenance;
+
+        if (IsMaintenanceDue(now))
+            return AircraftStatus.Maintenance;
+
+        var active = events.FirstOrDefault(e =>
+            e.AircraftId == Id &&
+            e.Start <= now &&
+            e.End >= now);
+
+        if (active is not null)
+            {
+            CurrentFlightStart = active.Start;
+
+            var next = events.FirstOrDefault(e => e.AircraftId == Id && e.Start > now);
+            NextBookingStart = next?.Start;
+            NextBookingEnd = next?.End;
+
+            return AircraftStatus.InFlight;
+            }
+
+        var future = events.FirstOrDefault(e =>
+            e.AircraftId == Id &&
+            e.Start > now);
+
+        if (future is not null)
+            {
+            NextBookingStart = future.Start;
+            NextBookingEnd = future.End;
+
+            return AircraftStatus.Scheduled;
+            }
+
+        return AircraftStatus.Available;
+        }
+
+    public async Task RefreshOperationalStateAsync(DbHelper db, IReadOnlyList<FlightEvent> events)
+        {
+        SquawkCount = await db.GetOpenSquawksCount(Id);
+        var hasGroundingSquawk = await db.AircraftHasGroundingSquawk(Id);
+
+        Status = CalculateStatus(events, hasGroundingSquawk);
+        }
+
+    public async Task RefreshSquawksAsync(DbHelper db)
+        {
+        SquawkCount = await db.GetOpenSquawksCount(Id);
+        }
+
 
 
 

@@ -1,5 +1,6 @@
 ﻿using AirTrack.Server.Data;
 using AirTrack.Server.Models.Aircraft;
+using AirTrack.Server.Models.FormModel;
 using AirTrack.Server.Models.Maintenance;
 using AirTrack.Server.Models.People;
 using AirTrack.Server.Models.Scheduler;
@@ -240,7 +241,6 @@ namespace AirTrack.Server.Data
                 .CountAsync(s => s.AircraftId == aircraftId && s.ResolvedAt == null);
             }
 
-
         // ADD SQUAWK
         public async Task AddSquawk(Squawk squawk)
             {
@@ -267,7 +267,8 @@ namespace AirTrack.Server.Data
             {
             return await _context.Squawks.FindAsync(id);
             }
-
+        
+        // HAS GROUNDING SQUAWK
         public async Task<bool> AircraftHasGroundingSquawk(int aircraftId)
             {
             return await _context.Squawks
@@ -275,6 +276,179 @@ namespace AirTrack.Server.Data
                                s.IsGrounding &&
                                s.ResolvedAt == null);
             }
+
+        // GET MAINTENANCE
+        public async Task<(AircraftBase? Aircraft, List<Squawk> OpenSquawks)> GetMaintenanceAircraftAsync(int id)
+            {
+            var aircraft = await GetAircraft(id);
+            var openSquawks = await GetOpenSquawks(id);
+            var events = await GetAllEvents();
+
+            if (aircraft is not null)
+                {
+                await aircraft.RefreshSquawksAsync(this);
+                await aircraft.RefreshOperationalStateAsync(this, events);
+                }
+
+            return (aircraft, openSquawks);
+            }
+
+        // ADD SQUAWK + REFRESH
+        public async Task AddSquawkAndRefreshAsync(AircraftBase aircraft, string description, bool isGrounding)
+            {
+            var squawk = new Squawk
+                {
+                AircraftId = aircraft.Id,
+                Description = description,
+                IsGrounding = isGrounding,
+                ReportedAt = DateTime.UtcNow
+                };
+
+            await AddSquawk(squawk);
+
+            var events = await GetAllEvents();
+
+            await aircraft.RefreshSquawksAsync(this);
+            await aircraft.RefreshOperationalStateAsync(this, events);
+            }
+        
+        // RESOLVE SQUAWK + REFRESH
+        public async Task ResolveSquawkAndRefreshAsync(AircraftBase aircraft, int squawkId, string notes, string signoff)
+            {
+            await ResolveSquawk(squawkId, notes, signoff);
+
+            var events = await GetAllEvents();
+
+            await aircraft.RefreshSquawksAsync(this);
+            await aircraft.RefreshOperationalStateAsync(this, events);
+            }
+
+        // SAVE MX INFO + REFRESH
+        public async Task<(List<AircraftBase> AircraftList, List<Squawk> OpenSquawks)> SaveMxInfoAndRefreshAsync(AircraftBase aircraft)
+            {
+            await aircraft.RefreshSquawksAsync(this);
+
+            var events = await GetAllEvents();
+            await aircraft.RefreshOperationalStateAsync(this, events);
+
+            await UpdateAircraft(aircraft);
+
+            var list = await GetAllAircraft();
+            var squawks = await GetOpenSquawks(aircraft.Id);
+
+            return (list, squawks);
+            }
+
+        public List<FlightEvent> FilterEventsByAircraft(List<FlightEvent> events, int aircraftId)
+            {
+            return events.Where(ev => ev.AircraftId == aircraftId).ToList();
+            }
+
+        public List<FlightEvent> FilterEventsByDate(List<FlightEvent> events, DateTime date)
+            {
+            return events.Where(ev => ev.Start.Date == date.Date).ToList();
+            }
+
+        // SCHEDULER REFRESH 
+        public async Task<(List<AircraftBase> Aircraft, List<Instructor> Instructors, List<Student> Students,List<Mechanic> Mechanics,List<FlightEvent> Events)> RefreshSchedulerAsync(DateTime date)
+                {
+                var aircraft = await GetAllAircraft();
+                var instructors = await GetAllInstructors();
+                var students = await GetAllStudents();
+                var mechanics = await GetAllMechanics();
+
+                var allEvents = await GetAllEvents();
+                var dayEvents = FilterEventsByDate(allEvents, date);
+
+                return (aircraft, instructors, students, mechanics, dayEvents);
+                }
+
+        public FlightEvent MapToEntity(FlightEventFormModel model)
+            {
+            return new FlightEvent
+                {
+                Id = model.Id ?? 0,
+                AircraftId = model.AircraftId!.Value,
+                InstructorId = model.InstructorId,
+                StudentId = model.StudentId,
+                MechanicId = model.MechanicId,
+                Start = model.Start,
+                End = model.End
+                };
+            }
+
+        public FlightEventFormModel MapToFormModel(FlightEvent ev)
+            {
+            return new FlightEventFormModel
+                {
+                Id = ev.Id,
+                AircraftId = ev.AircraftId,
+                InstructorId = ev.InstructorId,
+                StudentId = ev.StudentId,
+                MechanicId = ev.MechanicId,
+                Start = ev.Start,
+                End = ev.End
+                };
+            }
+
+        public string GetEventLabel(FlightEvent ev, List<Instructor> instructors, List<Student> students)
+            {
+            var instructor = instructors.FirstOrDefault(i => i.Id == ev.InstructorId);
+            var student = students.FirstOrDefault(s => s.Id == ev.StudentId);
+
+            if (instructor is not null && student is not null)
+                return $"{instructor.LastName}/{student.LastName}";
+
+            if (instructor is not null)
+                return instructor.LastName;
+
+            if (student is not null)
+                return student.LastName;
+
+            return $"{ev.Start:HH:mm}-{ev.End:HH:mm}";
+            }
+
+        public string GetEventStyle(FlightEvent ev)
+            {
+            double hourHeight = 60;
+            double pxPerMinute = hourHeight / 60.0;
+
+            var start = ev.Start;
+            var end = ev.End;
+
+            double startOffset = Math.Ceiling(start.TimeOfDay.TotalMinutes * pxPerMinute);
+            double duration = Math.Ceiling((end - start).TotalMinutes * pxPerMinute);
+
+            if (duration < 15)
+                duration = 15;
+
+            return $"top:{startOffset}px;height:{duration}px;";
+            }
+
+        public FlightEventFormModel CreateDefaultEvent(DateTime date, bool isDelete = false)
+            {
+            if (isDelete)
+                {
+                return new FlightEventFormModel
+                    {
+                    Start = date.Date,
+                    End = date.Date
+                    };
+                }
+
+            return new FlightEventFormModel
+                {
+                Start = date.Date.AddHours(8),
+                End = date.Date.AddHours(9)
+                };
+            }
+
+
+
+
+
+
+
 
 
 

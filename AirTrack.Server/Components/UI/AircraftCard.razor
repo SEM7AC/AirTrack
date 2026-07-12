@@ -2,7 +2,7 @@
 
 <div class="aircraft-card">
     <div class="aircraft-type-tail">
-        @((MarkupString)$"{Aircraft.Model}&nbsp;&nbsp;•&nbsp;&nbsp;{Aircraft.TailNumber}")
+        @((MarkupString)$"{Aircraft.Model.GetDescription()}&nbsp;&nbsp;•&nbsp;&nbsp;{Aircraft.TailNumber}")
 
 
     </div>
