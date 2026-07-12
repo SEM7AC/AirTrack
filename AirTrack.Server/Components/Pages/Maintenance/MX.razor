@@ -7,6 +7,8 @@
 @rendermode InteractiveServer
 @inject DbHelper Db
 
+<PageTitle>AirTrack - Maintenance</PageTitle>
+
 <div class="mx-container">
 
     <div class="mx-top">
@@ -29,7 +31,7 @@
                     <li class="mx-aircraft-item @(selectedAircraft is not null && selectedAircraft.Id == a.Id ? "selected" : "")"
                         @onclick="() => SelectAircraft(a.Id)">
                         <div class="name">@a.TailNumber</div>
-                        <div class="sub">@a.Model</div>
+                        <div class="sub">@a.Model.GetDescription()</div>
                     </li>
                 }
             </ul>
