@@ -22,6 +22,30 @@
         <button type="button" @onclick="OpenEditDrawer">Edit</button>
         <button type="button" @onclick="OpenDeleteDrawer">Delete</button>
         <span class="event-count">Total: @Events.Count</span>
+        <span class="server-badges" style="margin-left: 10px;">
+
+    <span style="
+        background:#1e1e1e;
+        color:#4caf50;
+        padding:2px 6px;
+        border-radius:4px;
+        font-size:0.75rem;
+        margin-right:6px;
+        display:inline-block;">
+        Local: @DateTime.Now.ToString("HH:mm:ss")
+    </span>
+
+    <span style="
+        background:#1e1e1e;
+        color:#03a9f4;
+        padding:2px 6px;
+        border-radius:4px;
+        font-size:0.75rem;
+        display:inline-block;">
+        UTC: @DateTime.UtcNow.ToString("HH:mm:ss")
+    </span>
+
+</span>
         </div>
         <div class="day-nav">
             <button @onclick="PrevDay">◀</button>

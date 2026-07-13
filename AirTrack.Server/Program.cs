@@ -40,6 +40,7 @@ namespace AirTrack.Server
                 }
 
             app.UseHttpsRedirection();
+            app.UseMiddleware<SanitizeInputMiddleware>();
 
             app.UseStaticFiles();
             app.UseAntiforgery();
