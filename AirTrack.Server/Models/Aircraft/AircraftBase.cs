@@ -169,7 +169,7 @@ public abstract class AircraftBase
     
     public AircraftStatus CalculateStatus(IReadOnlyList<FlightEvent> events,bool hasGroundingSquawk)
         {
-        var now = DateTime.Now;
+        var now = TimeHelper.PacificNow;
 
         if (hasGroundingSquawk)
             return AircraftStatus.Maintenance;

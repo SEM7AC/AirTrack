@@ -346,7 +346,8 @@ namespace AirTrack.Server.Data
 
         public List<FlightEvent> FilterEventsByDate(List<FlightEvent> events, DateTime date)
             {
-            return events.Where(ev => ev.Start.Date == date.Date).ToList();
+            return events.Where(ev => TimeHelper.ToPacific(ev.Start).Date == date.Date).ToList();
+
             }
 
         // SCHEDULER REFRESH 
@@ -358,6 +359,9 @@ namespace AirTrack.Server.Data
                 var mechanics = await GetAllMechanics();
 
                 var allEvents = await GetAllEvents();
+
+                // Convert all event timestamps to Pacific
+                
                 var dayEvents = FilterEventsByDate(allEvents, date);
 
                 return (aircraft, instructors, students, mechanics, dayEvents);
@@ -372,8 +376,8 @@ namespace AirTrack.Server.Data
                 InstructorId = model.InstructorId,
                 StudentId = model.StudentId,
                 MechanicId = model.MechanicId,
-                Start = model.Start,
-                End = model.End
+                Start = TimeHelper.ToUtc(model.Start),
+                End = TimeHelper.ToUtc(model.End)
                 };
             }
 
