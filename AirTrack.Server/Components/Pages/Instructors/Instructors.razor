@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using AirTrack.Server.Data
 @using AirTrack.Server.Models.People
+@using AirTrack.Server.Components.UI
 
 @inject DbHelper Db
 
@@ -145,7 +146,7 @@
                 </div>
 
                 <button type="submit">Save</button>
-                <button type="button" @onclick="DeleteInstructor">Delete</button>
+                <button type="button" @onclick="ShowDeleteConfirm">Delete</button>
                 <button type="button" @onclick="ClearPanel">Cancel</button>
             </EditForm>
         }
@@ -153,6 +154,13 @@
     </div>
 
 </div>
+
+<ModalConfirmation
+    IsVisible="ShowConfirm"
+    Message="Are you sure you want to delete this instructor?"
+    OnConfirm="ConfirmDelete"
+    OnCancel="HideConfirm" />
+
 
 @code {
 
@@ -236,4 +244,30 @@
 
         ActivePanel = "";
     }
+    bool ShowConfirm = false;
+
+    void ShowDeleteConfirm()
+{
+    ShowConfirm = true;
+}
+
+    void HideConfirm()
+{
+    ShowConfirm = false;
+}
+
+    private async Task ConfirmDelete()
+{
+    if (SelectedInstructor is null)
+        return;
+
+    await Db.DeleteInstructor(SelectedInstructor.Id);
+    await LoadInstructors();
+
+    SelectedInstructor = null;
+    ActivePanel = "";
+
+    ShowConfirm = false; // closes modal
+}
+
 }
