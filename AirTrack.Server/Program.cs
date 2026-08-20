@@ -12,7 +12,7 @@ namespace AirTrack.Server
 
             // Register AirTrackContext here
             builder.Services.AddDbContext<AirTrackContext>(options =>
-            options.UseSqlite("Data Source=/var/data/airtrack.db")); 
+            options.UseSqlite("Data Source=airtrack.db")); 
             //remove var/data/ path only used to host on Render
             //should just be "airtrack.db"
 

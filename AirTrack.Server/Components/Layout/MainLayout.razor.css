@@ -21,7 +21,17 @@ app-content,
 .app-content {
     height: 100%;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
 }
+
+   
+
+.app-shell {
+    transform: scale(0.95);
+    transform-origin: top left;
+    width: calc(100% / 0.95);
+    height: calc(100% / 0.95);
+}
+
