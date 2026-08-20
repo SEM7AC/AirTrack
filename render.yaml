@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: airtrack
+    rootDir: AirTrack.Server
+    buildCommand: "dotnet build"
+    startCommand: "dotnet AirTrack.Server.dll"
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
